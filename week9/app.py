@@ -41,7 +41,7 @@ conn = mysql.connector.connect(
     database="taipei_day_trip"
 )
 cursor = conn.cursor()
-###################################################
+
 # 建立資料表（如果不存在）
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS attractions (
