@@ -27,7 +27,7 @@ async def thankyou(request: Request):
 
 # Week9
 # 讀取 JSON 檔案 
-with open(r"C:\Users\shiyi\Others\Program\Wehelp_6th_beggin_20250106\stage2\taipei-day-trip2\week9\data\taipei-attractions.json", "r", encoding="utf-8") as file:
+with open("data/taipei-attractions.json", "r", encoding="utf-8") as file:
     data = json.load(file)
 
 # 解析數據
