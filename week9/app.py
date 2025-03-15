@@ -26,8 +26,8 @@ async def thankyou(request: Request):
 	return FileResponse("./static/thankyou.html", media_type="text/html")
 
 # Week9
-# 讀取 JSON 檔案
-with open(r"C:\Users\shiyi\Others\Program\Wehelp_6th_beggin_20250106\taipei-day-trip\taipei-day-trip\data\taipei-attractions.json", "r", encoding="utf-8") as file:
+# 讀取 JSON 檔案 
+with open(r"C:\Users\shiyi\Others\Program\Wehelp_6th_beggin_20250106\stage2\taipei-day-trip2\week9\data\taipei-attractions.json", "r", encoding="utf-8") as file:
     data = json.load(file)
 
 # 解析數據
