@@ -50,7 +50,6 @@ for attraction in attractions:
 # 3個API
 @app.get("/api/attractions")
 async def get_attractions(page: int = 0, keyword: Optional[str] = None):
-    # 連線到 MySQL
     conn = mysql.connector.connect(
         host="localhost",
         user="root",
@@ -59,14 +58,11 @@ async def get_attractions(page: int = 0, keyword: Optional[str] = None):
     )
     cursor = conn.cursor(dictionary=True)
 
-    # 計算要跳過的筆數
     limit = 12
     offset = page * limit 
 
-    # 構造 SQL 查詢語句
     sql = "SELECT id, name, category, description, address, transport, mrt, latitude, longitude, images FROM attractions"
     
-    # 如果有關鍵字，增加 WHERE 條件
     if keyword:
         sql += " WHERE name LIKE %s OR mrt LIKE %s"
         search_keyword = f"%{keyword}%"
@@ -76,16 +72,20 @@ async def get_attractions(page: int = 0, keyword: Optional[str] = None):
 
     results = cursor.fetchall()
 
-    # 確保 `images` 欄位是乾淨的 list
     for attraction in results:
-        attraction["images"] = json.loads(attraction["images"])  # 轉換回 list
+        attraction["images"] = json.loads(attraction["images"])  
 
-    # 計算是否還有下一頁
-    cursor.execute("SELECT COUNT(*) FROM attractions")
+    # 重新計算 total_count (根據 keyword 來查詢總數)
+    if keyword:
+        cursor.execute("SELECT COUNT(*) FROM attractions WHERE name LIKE %s OR mrt LIKE %s", (search_keyword, search_keyword))
+    else:
+        cursor.execute("SELECT COUNT(*) FROM attractions")
+
     total_count = cursor.fetchone()["COUNT(*)"]
-    next_page = page + 1 if total_count > offset + limit else None
 
-    # 關閉資料庫連線
+    # 只有當有查詢結果時才決定 nextPage
+    next_page = page + 1 if total_count > (offset + limit) and results else None
+
     cursor.close()
     conn.close()
 
