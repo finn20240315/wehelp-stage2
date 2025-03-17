@@ -1,15 +1,17 @@
 from fastapi import *
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse ,JSONResponse
 from typing import List, Optional
 import json
-import mysql.connector
-import os
-import re
+import mysql.connector # 與 MySQL 資料庫建立連線
+import os # 操作檔案系統，如 os.path.dirname(__file__) 取得目前檔案所在的目錄
+import re # 正規表達式
 
+# 建立 FastAPI 應用程式，這將是我們的 API 伺服器
 app=FastAPI()
 
-# 設定靜態檔案夾的位置
+# 偵測我目前執行資料夾的位置
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+print("目前資料夾位置:",STATIC_DIR)
 
 # Static Pages (Never Modify Code in this Block)
 @app.get("/", include_in_schema=False)
@@ -24,68 +26,15 @@ async def booking(request: Request):
 @app.get("/thankyou", include_in_schema=False)
 async def thankyou(request: Request):
 	return FileResponse("./static/thankyou.html", media_type="text/html")
+# include_in_schema=False 代表這些路由 不會顯示在 API 文件（例如 Swagger UI）
 
 # Week9
-# 讀取 JSON 檔案
-with open(r"C:\Users\shiyi\Others\Program\Wehelp_6th_beggin_20250106\taipei-day-trip\taipei-day-trip\data\taipei-attractions.json", "r", encoding="utf-8") as file:
-    data = json.load(file)
+# 開啟並讀取 taipei-attractions.json 檔案
+with open("data/taipei-attractions.json", "r", encoding="utf-8") as file:
+    data = json.load(file) # 將 JSON 轉換成 Python 字典 (dict)
 
-# 解析數據
+# 從 JSON 中提取景點資料：景點資料是一個 列表 (list)
 attractions = data["result"]["results"]
-
-# 連線到 MySQL
-conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="0000",
-    database="taipei_day_trip"
-)
-cursor = conn.cursor()
-###################################################
-# 建立資料表（如果不存在）
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS attractions (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    category VARCHAR(255),
-    description TEXT,
-    address VARCHAR(255),
-    transport TEXT,
-    mrt VARCHAR(255),
-    latitude FLOAT,
-    longitude FLOAT,
-    images TEXT
-);
-""")
-
-# 過濾符合條件的圖片
-def filter_images(image_urls):
-    pattern = re.compile(r"https?://.*\.(jpg|jpeg|png)$", re.IGNORECASE)
-    valid_images = [url.strip() for url in image_urls.split("https://") if pattern.match("https://" + url)]
-    return json.dumps(["https://" + url for url in valid_images])
-
-# 插入景點資料
-for attraction in attractions:
-    name = attraction["name"]
-    category = attraction.get("CAT", "")
-    description = attraction.get("description", "")
-    address = attraction.get("address", "")
-    transport = attraction.get("direction", "")
-    mrt = attraction.get("MRT", "")
-    latitude = float(attraction["latitude"])
-    longitude = float(attraction["longitude"])
-    images = filter_images(attraction["file"])
-
-    sql = """
-    INSERT INTO attractions (name, category, description, address, transport, mrt, latitude, longitude, images)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    cursor.execute(sql, (name, category, description, address, transport, mrt, latitude, longitude, images))
-
-# 提交變更並關閉連線
-conn.commit()
-
-print("資料已成功存入 MySQL！")
 
 # 定義 mrt_stations（假設從 attractions 取得資料）
 mrt_stations = []
@@ -101,45 +50,109 @@ for attraction in attractions:
 # 3個API
 @app.get("/api/attractions")
 async def get_attractions(page: int = 0, keyword: Optional[str] = None):
-    # 篩選資料
-    filtered_attractions = [attr for attr in attractions if (not keyword or keyword.lower() in attr["name"].lower() or (attr.get("mrt") and keyword.lower() in attr.get("mrt", "").lower()))]
-    # 分頁邏輯
-    start = page * 12
-    end = start + 12
-    data = filtered_attractions[start:end]
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="0000",
+        database="taipei_day_trip"
+    )
+    cursor = conn.cursor(dictionary=True)
+
+    limit = 12
+    offset = page * limit 
+
+    sql = "SELECT id, name, category, description, address, transport, mrt, latitude, longitude, images FROM attractions"
     
-    # 回應資料
-    next_page = page + 1 if len(filtered_attractions) > end else None
-    
-    return {"nextPage": next_page, "data": data}
+    if keyword:
+        sql += " WHERE name LIKE %s OR mrt LIKE %s"
+        search_keyword = f"%{keyword}%"
+        cursor.execute(sql + " LIMIT %s OFFSET %s", (search_keyword, search_keyword, limit, offset))
+    else:
+        cursor.execute(sql + " LIMIT %s OFFSET %s", (limit, offset))
+
+    results = cursor.fetchall()
+
+    for attraction in results:
+        attraction["images"] = json.loads(attraction["images"])  
+
+    # 重新計算 total_count (根據 keyword 來查詢總數)
+    if keyword:
+        cursor.execute("SELECT COUNT(*) FROM attractions WHERE name LIKE %s OR mrt LIKE %s", (search_keyword, search_keyword))
+    else:
+        cursor.execute("SELECT COUNT(*) FROM attractions")
+
+    total_count = cursor.fetchone()["COUNT(*)"]
+
+    # 只有當有查詢結果時才決定 nextPage
+    next_page = page + 1 if total_count > (offset + limit) and results else None
+
+    cursor.close()
+    conn.close()
+
+    return JSONResponse({"nextPage": next_page, "data": results})
 
 @app.get("/api/attraction/{attractionId}")
 async def get_attraction(attractionId: int):
-    print("印出景點data：",attractions)  # 打印 attractions 檢查結構
-	# 查找景點資料
-    attraction = next((attr for attr in attractions if attr["id"] == attractionId), None)
-    
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="0000",
+        database="taipei_day_trip"
+    )
+    cursor = conn.cursor(dictionary=True)
+
+    # 查詢指定景點
+    sql = "SELECT id, name, category, description, address, transport, mrt, latitude, longitude, images FROM attractions WHERE id = %s"
+    cursor.execute(sql, (attractionId,))
+    attraction = cursor.fetchone()
+
+    # 如果找不到景點，回傳 404
     if not attraction:
-        raise HTTPException(status_code=404, detail="景點編號不正確")
-    
-    return {"data": attraction}
+        cursor.close()
+        conn.close()
+        return JSONResponse({"error":True,"message":"景點編號不正確"},status_code=404)
+
+    # 確保 `images` 是乾淨的 list
+    attraction["images"] = json.loads(attraction["images"])
+
+    # 關閉連線
+    cursor.close()
+    conn.close()
+
+    return JSONResponse({"data": attraction})
+
+    # 400-499: Client Error
+    # 500-599: Server Error
+    # 200-299: Success
+    # 300-399: Redirect 跳轉
+    # 100-199: Informational 資訊
 
 @app.get("/api/mrts")
 async def get_mrts():
-    # 根據景點數量排序
-    mrt_stations_sorted = sorted(mrt_stations, key=lambda x: x["attractions_count"], reverse=True)
-    
-    # 回傳捷運站名稱
-    return {"data": [mrt["name"] for mrt in mrt_stations_sorted]}
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="0000",
+        database="taipei_day_trip"
+    )
+    cursor = conn.cursor(dictionary=True)
 
-# print("前三筆資料：",attractions[:3])  # 打印前三筆資料檢查是否有 'id'
+    # 從 MySQL 查詢各 MRT 站的景點數量
+    sql = """
+    SELECT mrt, COUNT(*) as attractions_count 
+    FROM attractions 
+    WHERE mrt IS NOT NULL AND mrt != ''
+    GROUP BY mrt 
+    ORDER BY attractions_count DESC;
+    """
+    cursor.execute(sql)
+    mrt_stations = cursor.fetchall()
 
-# 查詢資料庫並檢查資料
-cursor.execute("SELECT * FROM attractions")
-columns = [column[0] for column in cursor.description]  # 取得欄位名稱
-attractions = [dict(zip(columns, row)) for row in cursor.fetchall()]
+    # 關閉連線
+    cursor.close()
+    conn.close()
 
-cursor.close()
-conn.close()
+    # 只回傳捷運站名稱（依景點數排序）
+    return JSONResponse({"data": [mrt["mrt"] for mrt in mrt_stations]})  # 只回傳捷運站名稱
 
 # taskkill /F /IM python.exe /T
