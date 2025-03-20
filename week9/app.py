@@ -5,9 +5,20 @@ import json
 import mysql.connector # 與 MySQL 資料庫建立連線
 import os # 操作檔案系統，如 os.path.dirname(__file__) 取得目前檔案所在的目錄
 import re # 正規表達式
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 # 建立 FastAPI 應用程式，這將是我們的 API 伺服器
 app=FastAPI()
+
+# 設置 CORS 允許來自特定來源的請求
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 允許來自這個 URL 的請求
+    allow_credentials=True,
+    allow_methods=["*"],  # 允許所有 HTTP 方法
+    allow_headers=["*"],  # 允許所有標頭
+)
 
 # 偵測我目前執行資料夾的位置
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
@@ -154,5 +165,8 @@ async def get_mrts():
 
     # 只回傳捷運站名稱（依景點數排序）
     return JSONResponse({"data": [mrt["mrt"] for mrt in mrt_stations]})  # 只回傳捷運站名稱
+
+# 掛載靜態資源
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # taskkill /F /IM python.exe /T

@@ -1,0 +1,385 @@
+* {
+  border: red solid 1px;
+}
+
+/*全域設定*/
+* {
+  border: solid 0.1px red;
+  box-sizing: border-box; /* 計算寬度時包含邊框和內距 */
+}
+html {
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  height: 100%;
+}
+body {
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  height: 100%;
+  font-family: "Noto Sans TC", sans-serif; /* 設定字型 */
+  font-weight: 700; /* 粗體 */
+  font-size: 16px; /* 字體大小 */
+  line-height: 13.3px; /* 行高 */
+  letter-spacing: 0%; /* 字距 */
+  vertical-align: middle; /* 垂直對齊 */
+}
+/*電腦版 1920px*/
+/*header表頭*/
+nav {
+  padding: 10px;
+  width: 1200px;
+  height: 54px;
+  margin: 0 auto; /* 左右自動調整，使元素水平居中 */
+}
+nav div {
+  width: 100%; /* 讓導航欄撐滿畫面 */
+  max-width: 1200px; /* 最大寬度 1200px */
+  height: 34px; /* 高度 34px */
+  display: flex; /* 使用 Flexbox 排版 */
+  justify-content: space-between; /* 讓子元素左右對齊 */
+  align-items: center; /* 垂直置中 */
+  padding: 0 10px; /* 左右內距 10px */
+  background-color: burlywood; /* 可視需求增加背景色 */
+}
+nav div h2 {
+  color: #448899;
+  width: 250px;
+  height: auto;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 34px;
+  background-color: beige;
+}
+nav div .container {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  background-color: aqua;
+}
+nav div .container button {
+  background-color: greenyellow;
+}
+nav div .container button h4 {
+  font-size: 16px;
+  font-weight: 500;
+}
+/*首圖橫幅*/
+.hero-section {
+  background-color: #f5f5f5;
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+.welcome {
+  background-image: url("/static/images/welcome_image.png");
+  background-repeat: no-repeat; /* 不重複填滿 */
+  background-size: cover; /* 保持圖片原尺寸 */
+  background-position: 0 0; /* 設定左上角位置 */
+  width: 100%;
+  height: 320px;
+}
+
+/*捷運站選單*/
+.list-bar {
+  display: flex;
+  align-items: center; /* 垂直置中 */
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px;
+  background-color: #f8f8f8;
+}
+
+.container {
+  flex: 1;
+  overflow-x: auto; /* 允許橫向滾動 */
+  white-space: nowrap; /* 防止內容換行 */
+}
+
+.listitem-container {
+  display: flex; /* 讓 <li> 橫向排列 */
+  gap: 10px; /* 項目間距 */
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.listitem {
+  padding: 8px 12px;
+  background-color: #ddd;
+  border-radius: 5px;
+  white-space: nowrap; /* 防止站名換行 */
+}
+
+/* 左右按鈕樣式 */
+.left-container,
+.right-container {
+  display: flex;
+  align-items: center;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.arrow-left,
+.arrow-right {
+  width: 30px;
+  height: 30px;
+  background-size: contain; /* 確保圖片完整顯示 */
+  background-repeat: no-repeat; /* 防止圖片重複 */
+  background-position: center; /* 讓圖片置中 */
+  border: none;
+  cursor: pointer;
+}
+/* 設定左箭頭圖片 */
+.arrow-left {
+  background-image: url("/static/images/arrow-left-dark.png");
+}
+
+/* 設定右箭頭圖片 */
+.arrow-right {
+  background-image: url("/static/images/arrow-right.png");
+}
+
+.arrow-left-default::before,
+.arrow-right-default::before {
+  content: "◀"; /* 左右箭頭 */
+  color: white;
+  font-size: 20px;
+}
+
+.arrow-right-default::before {
+  content: "▶";
+}
+
+/***************************************************************/
+.attractions {
+  padding: 15px;
+  background-color: bisque;
+  width: 1200px;
+  margin: 0 auto;
+}
+.attractions-group {
+  background-color: aquamarine;
+  padding: 20px;
+  width: 1200px;
+  margin: 0 auto; /* 上下邊距為 0，左右邊距為 auto，使容器在水平方向上居中 */
+  height: 2000px;
+  display: flex;
+  flex-wrap: wrap; /* 超出寬度自動換行 */
+  justify-content: flex-start; /* 元素左右對齊 */
+  align-content: flex-start; /* 元素間距 */
+  gap: 20px; /* 元素間距 */
+}
+
+.attraction {
+  width: 100%; /* 使用百分比，讓其寬度隨著容器大小變化 */
+  max-width: 270px; /* 設定最大寬度 */
+  height: 242px; /* 高度根據內容調整 */
+  overflow: hidden; /* 超出部分隱藏 */
+  background-color: white;
+  border: #e8e8e8 1px solid;
+  border-radius: 5px;
+  text-align: center;
+  position: relative; /* 使得 p 可以相對於 .attraction 定位 */
+}
+
+.attraction img {
+  width: 100%; /* 圖片寬度自適應容器 */
+  height: 197px; /* 最大高度限制 */
+  object-fit: cover; /* 保持圖片比例不變，裁切圖片 */
+}
+
+.attraction p.name {
+  position: absolute;
+  bottom: 43px;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  text-align: start;
+  color: white;
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+  margin: 0;
+  box-sizing: border-box; /* 確保 padding 不影響寬度 */
+}
+.attraction p.details {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: white;
+  color: black;
+  padding: 0px;
+  margin: 0px;
+}
+.attraction p.mrt {
+  background-color: white;
+  color: black;
+  text-align: left;
+}
+.attraction p.category {
+  background-color: white;
+  color: black;
+  text-align: right;
+}
+
+/* 手機 RWD：最大寬度 768px，針對手機裝置 */
+@media screen and (max-width: 768px) {
+  /* 全域設定 */
+  * {
+    border: solid 0.1px blue; /* 測試用藍色邊框 */
+  }
+
+  body {
+    font-size: 14px; /* 字體稍微縮小 */
+    line-height: 1.5; /* 提高可讀性 */
+  }
+
+  /* Header 表頭 */
+  nav {
+    width: 100%;
+    padding: 5px 10px; /* 減少 padding 讓內容不擠 */
+    height: auto;
+  }
+
+  nav div {
+    flex-direction: column; /* 堆疊內容 */
+    align-items: center; /* 讓內容置中 */
+    padding: 5px;
+  }
+
+  nav div h2 {
+    font-size: 24px; /* 縮小標題字體 */
+    text-align: center;
+    width: auto;
+  }
+
+  nav div .container {
+    justify-content: center; /* 按鈕置中 */
+    margin-top: 5px;
+  }
+
+  nav div .container button {
+    padding: 8px 12px; /* 增加按鈕可點擊範圍 */
+  }
+
+  nav div .container button h4 {
+    font-size: 14px; /* 縮小按鈕內文字 */
+  }
+
+  /* 首圖橫幅 */
+  .hero-section {
+    height: 250px; /* 縮小高度 */
+  }
+
+  .welcome {
+    height: 250px; /* 縮小背景圖片 */
+    background-position: center;
+  }
+
+  /* 捷運站選單 */
+  .list-bar {
+    flex-direction: column; /* 讓選單垂直排列 */
+    align-items: center;
+    padding: 5px;
+  }
+
+  .container {
+    width: 100%;
+    overflow-x: auto; /* 允許橫向滾動 */
+    display: flex;
+    justify-content: center;
+  }
+
+  .listitem-container {
+    flex-wrap: nowrap;
+    gap: 5px; /* 減少間距 */
+  }
+
+  .listitem {
+    padding: 6px 10px; /* 縮小 padding */
+    font-size: 12px;
+  }
+
+  /* 左右按鈕 */
+  .left-container,
+  .right-container {
+    display: none; /* 手機版不顯示左右切換按鈕 */
+  }
+
+  .attractions {
+    padding: 10px;
+    background-color: bisque;
+    width: 100%; /* 讓容器寬度填滿螢幕 */
+    margin: 0 auto;
+  }
+
+  .attractions-group {
+    background-color: aquamarine;
+    padding: 15px;
+    width: 100%; /* 容器寬度自動調整 */
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap; /* 讓元素自動換行 */
+    justify-content: center; /* 元素水平置中 */
+    align-content: flex-start; /* 元素垂直對齊 */
+    gap: 10px; /* 更小的間距 */
+  }
+
+  .attraction {
+    width: 100%; /* 元素寬度佔滿父容器 */
+    max-width: 100%; /* 讓元素佔滿螢幕寬度 */
+    height: auto; /* 高度自動調整 */
+    overflow: hidden;
+    background-color: white;
+    border: #e8e8e8 1px solid;
+    border-radius: 5px;
+    text-align: center;
+    position: relative;
+  }
+
+  .attraction img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .attraction p.name {
+    position: absolute;
+    bottom: 43px;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    text-align: start;
+    color: white;
+    width: 100%;
+    height: 40px;
+    padding: 10px;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  .attraction p.details {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: white;
+    color: black;
+    padding: 0px;
+    margin: 0px;
+  }
+
+  .attraction p.mrt,
+  .attraction p.category {
+    background-color: white;
+    color: black;
+    text-align: left;
+  }
+}
