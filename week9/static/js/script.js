@@ -14,8 +14,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const leftArrow = document.querySelector(".arrow-left");
   const rightArrow = document.querySelector(".arrow-right");
 
-  console.log("🔍 searchBtn:", searchBtn);
-  console.log("🔍 searchInput:", searchInput);
+  console.log("searchBtn:", searchBtn);
+  console.log("searchInput:", searchInput);
 
   // 初始化捷運站列表
   fetchMRTStations();
