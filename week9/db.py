@@ -4,7 +4,7 @@ import os # 操作檔案系統，如 os.path.dirname(__file__) 取得目前檔�
 import re # 正規表達式
 
 # Week9
-# 開啟並讀取 taipei-attractions.json 檔案
+# 開啟並讀取本機的 taipei-attractions.json 檔案
 with open("data/taipei-attractions.json", "r", encoding="utf-8") as file:
     data = json.load(file) # 將 JSON 轉換成 Python 字典 (dict)
 

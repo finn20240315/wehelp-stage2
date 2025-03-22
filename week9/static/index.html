@@ -1,11 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Index</title>
-</head>
-<body>
-  
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Index</title>
+  </head>
+  <body>
+    <header>
+      <!--表頭-->
+      <nav>
+        <div>
+          <div class="taipei-trip">台北一日遊</div>
+          <div class="nav-container">
+            <div class="for-nav">
+              <div class="appointment">預定行程</div>
+            </div>
+            <div class="for-nav">
+              <div class="sign-in">登入/註冊</div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <!--首頁主圖橫幅-->
+      <div class="hero-section">
+        <div class="slogan">
+          <h2>輕鬆享受台北一日悠閒</h2>
+          <h4>探索每個角落，體驗城市的深度旅遊行程</h4>
+          <div class="search-bar">
+            <input type="text" class="input" placeholder="輸入景點名稱查詢" />
+            <button class="btn">
+              <img src="/static/images/btn.png" alt="search-bar-btn" />
+            </button>
+          </div>
+        </div>
+        <div class="welcome"></div>
+      </div>
+    </header>
+    <main>
+      <!--捷運站列表-->
+      <div class="list-bar">
+        <div class="left-container">
+          <button class="arrow-left">
+            <span class="arrow-left-default"></span>
+          </button>
+        </div>
+        <div class="container">
+          <ul class="listitem-container">
+            <li class="listitem">新北投</li>
+            <li class="listitem">劍潭</li>
+            <li class="listitem">關渡</li>
+            <li class="listitem">圓山</li>
+            <li class="listitem">中山</li>
+            <li class="listitem">龍山寺</li>
+            <li class="listitem">動物園</li>
+            <li class="listitem">雙連</li>
+            <li class="listitem">臺大醫院</li>
+            <li class="listitem">忠孝新生</li>
+            <li class="listitem">市政府</li>
+            <li class="listitem">中正紀念堂</li>
+            <li class="listitem">士林</li>
+            <li class="listitem">葫洲</li>
+            <li class="listitem">木柵</li>
+            <li class="listitem">芝山</li>
+            <li class="listitem">北投</li>
+            <li class="listitem">松山</li>
+            <li class="listitem">西門</li>
+            <li class="listitem">忠義</li>
+            <li class="listitem">公館</li>
+            <li class="listitem">石牌</li>
+            <li class="listitem">大直</li>
+            <li class="listitem">大湖公園</li>
+            <li class="listitem">文德</li>
+            <li class="listitem">國父紀念館</li>
+            <li class="listitem">松江南京</li>
+            <li class="listitem">台北101／世貿</li>
+            <li class="listitem">行天宮</li>
+            <li class="listitem">象山</li>
+            <li class="listitem">大安森林公園</li>
+            <li class="listitem">唭哩岸</li>
+          </ul>
+        </div>
+        <div class="right-container">
+          <button class="arrow-right">
+            <span class="arrow-right-default"></span>
+          </button>
+        </div>
+      </div>
+      <!--景點列表-->
+      <div class="attractions">
+        <div class="attractions-group"></div>
+      </div>
+    </main>
+    <!--表尾-->
+    <footer>
+      <div><h2>COPYRIGHT © 2021 台北一日遊</h2></div>
+    </footer>
+    <script src="/static/js/script.js" defer></script>
+  </body>
 </html>
