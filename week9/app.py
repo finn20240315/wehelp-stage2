@@ -60,13 +60,13 @@ for attraction in attractions:
 # 3個API
 @app.get("/api/attractions")
 async def get_attractions(page: int = 0, keyword: Optional[str] = None):
-    print(f"✅ API 被呼叫: /api/attractions?page={page}&keyword={keyword}")  # Debug 訊息
+    print(f"API 被呼叫: /api/attractions?page={page}&keyword={keyword}")  # Debug 訊息
     conn = mysql.connector.connect(
         host="localhost",
         user="root",
         password="0000",
         database="taipei_day_trip",
-        charset="utf8mb4"  # ✅ 確保 MySQL 連線使用 UTF-8
+        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
 
     )
     cursor = conn.cursor(dictionary=True)
@@ -135,7 +135,7 @@ async def get_attraction(attractionId: int):
         user="root",
         password="0000",
         database="taipei_day_trip",
-        charset="utf8mb4"  # ✅ 確保 MySQL 連線使用 UTF-8
+        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
 
     )
     cursor = conn.cursor(dictionary=True)
@@ -173,7 +173,7 @@ async def get_mrts():
         user="root",
         password="0000",
         database="taipei_day_trip",
-        charset="utf8mb4"  # ✅ 確保 MySQL 連線使用 UTF-8
+        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
 
     )
     cursor = conn.cursor(dictionary=True)
