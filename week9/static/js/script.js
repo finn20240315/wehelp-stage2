@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const API_BASE_URL = "http://127.0.0.1:8000/api/attractions";
-  const MRT_API_URL = "http://127.0.0.1:8000/api/mrts"; // ✅ 新增捷運站 API
+  const API_BASE_URL = "http://13.211.94.227:8000//api/attractions";
+  const MRT_API_URL = "http://13.211.94.227:8000/api/mrts"; // 新增捷運站 API
   let allPlaces = []; // 存放所有景點資料
   let currentPage = 0; // 目前 API 請求的頁數
   let nextPage = 0; // 下一頁的頁碼
