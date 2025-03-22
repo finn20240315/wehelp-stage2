@@ -1,16 +1,15 @@
-from fastapi import *
+from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse ,JSONResponse
-from typing import List, Optional
+from typing import Optional
 import json
 import mysql.connector # 與 MySQL 資料庫建立連線
 import os # 操作檔案系統，如 os.path.dirname(__file__) 取得目前檔案所在的目錄
-import re # 正規表達式
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 # 建立 FastAPI 應用程式，這將是我們的 API 伺服器
 app=FastAPI()
-
+#####################################################################
 # 設置 CORS 允許來自特定來源的請求
 app.add_middleware(
     CORSMiddleware,
@@ -61,11 +60,14 @@ for attraction in attractions:
 # 3個API
 @app.get("/api/attractions")
 async def get_attractions(page: int = 0, keyword: Optional[str] = None):
+    print(f"✅ API 被呼叫: /api/attractions?page={page}&keyword={keyword}")  # Debug 訊息
     conn = mysql.connector.connect(
         host="localhost",
         user="root",
         password="0000",
-        database="taipei_day_trip"
+        database="taipei_day_trip",
+        charset="utf8mb4"  # ✅ 確保 MySQL 連線使用 UTF-8
+
     )
     cursor = conn.cursor(dictionary=True)
 
@@ -74,33 +76,57 @@ async def get_attractions(page: int = 0, keyword: Optional[str] = None):
 
     sql = "SELECT id, name, category, description, address, transport, mrt, latitude, longitude, images FROM attractions"
     
+    params = []
     if keyword:
         sql += " WHERE name LIKE %s OR mrt LIKE %s"
         search_keyword = f"%{keyword}%"
-        cursor.execute(sql + " LIMIT %s OFFSET %s", (search_keyword, search_keyword, limit, offset))
-    else:
-        cursor.execute(sql + " LIMIT %s OFFSET %s", (limit, offset))
+        params.extend([search_keyword, search_keyword])
 
+    sql += " LIMIT %s OFFSET %s"
+    params.extend([limit, offset])
+
+    cursor.execute(sql, params)
     results = cursor.fetchall()
+
+    # if keyword:
+    #     sql += " WHERE name LIKE %s OR mrt LIKE %s"
+    #     search_keyword = f"%{keyword}%"
+    #     cursor.execute(sql + " LIMIT %s OFFSET %s", (search_keyword, search_keyword, limit, offset))
+    # else:
+    #     cursor.execute(sql + " LIMIT %s OFFSET %s", (limit, offset))
+
+    # results = cursor.fetchall()
 
     for attraction in results:
         attraction["images"] = json.loads(attraction["images"])  
 
-    # 重新計算 total_count (根據 keyword 來查詢總數)
+    # 計算總數
+    count_sql = "SELECT COUNT(*) FROM attractions"
+    count_params = []
     if keyword:
-        cursor.execute("SELECT COUNT(*) FROM attractions WHERE name LIKE %s OR mrt LIKE %s", (search_keyword, search_keyword))
-    else:
-        cursor.execute("SELECT COUNT(*) FROM attractions")
-
+        count_sql += " WHERE name LIKE %s OR mrt LIKE %s"
+        count_params.extend([search_keyword, search_keyword])
+    cursor.execute(count_sql, count_params)
+    
     total_count = cursor.fetchone()["COUNT(*)"]
+    next_page = page + 1 if total_count > (offset + limit) else None
 
-    # 只有當有查詢結果時才決定 nextPage
-    next_page = page + 1 if total_count > (offset + limit) and results else None
+
+    # # 重新計算 total_count (根據 keyword 來查詢總數)
+    # if keyword:
+    #     cursor.execute("SELECT COUNT(*) FROM attractions WHERE name LIKE %s OR mrt LIKE %s", (search_keyword, search_keyword))
+    # else:
+    #     cursor.execute("SELECT COUNT(*) FROM attractions")
+
+    # total_count = cursor.fetchone()["COUNT(*)"]
+
+    # # 只有當有查詢結果時才決定 nextPage
+    # next_page = page + 1 if total_count > (offset + limit) and results else None
 
     cursor.close()
     conn.close()
 
-    return JSONResponse({"nextPage": next_page, "data": results})
+    return JSONResponse({"nextPage": next_page, "data": results}, media_type="application/json; charset=utf-8")
 
 @app.get("/api/attraction/{attractionId}")
 async def get_attraction(attractionId: int):
@@ -108,7 +134,9 @@ async def get_attraction(attractionId: int):
         host="localhost",
         user="root",
         password="0000",
-        database="taipei_day_trip"
+        database="taipei_day_trip",
+        charset="utf8mb4"  # ✅ 確保 MySQL 連線使用 UTF-8
+
     )
     cursor = conn.cursor(dictionary=True)
 
@@ -144,7 +172,9 @@ async def get_mrts():
         host="localhost",
         user="root",
         password="0000",
-        database="taipei_day_trip"
+        database="taipei_day_trip",
+        charset="utf8mb4"  # ✅ 確保 MySQL 連線使用 UTF-8
+
     )
     cursor = conn.cursor(dictionary=True)
 

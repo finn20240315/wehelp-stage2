@@ -4,32 +4,51 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
     <title>Index</title>
   </head>
   <body>
     <header>
+      <!--表頭-->
       <nav>
         <div>
-          <h2>台北一日遊</h2>
-          <div class="container">
-            <button class="for-nav">
-              <h4>預定行程</h4>
-            </button>
-            <button class="for-nav">
-              <h4>登入/註冊</h4>
-            </button>
+          <div class="taipei-trip">台北一日遊</div>
+          <div class="nav-container">
+            <div class="for-nav">
+              <div class="appointment">預定行程</div>
+            </div>
+            <div class="for-nav">
+              <div class="sign-in">登入/註冊</div>
+            </div>
           </div>
         </div>
       </nav>
+      <!--首頁主圖橫幅-->
       <div class="hero-section">
+        <div class="slogan">
+          <h2>輕鬆享受台北一日悠閒</h2>
+          <h4>探索每個角落，體驗城市的深度旅遊行程</h4>
+          <div class="search-bar">
+            <input type="text" class="input" placeholder="輸入景點名稱查詢" />
+            <button class="btn">
+              <img src="/static/images/btn.png" alt="search-bar-btn" />
+            </button>
+          </div>
+        </div>
         <div class="welcome"></div>
       </div>
     </header>
     <main>
+      <!--捷運站列表-->
       <div class="list-bar">
         <div class="left-container">
           <button class="arrow-left">
-            <button class="arrow-left-default"></button>
+            <span class="arrow-left-default"></span>
           </button>
         </div>
         <div class="container">
@@ -70,16 +89,18 @@
         </div>
         <div class="right-container">
           <button class="arrow-right">
-            <button class="arrow-right-default"></button>
+            <span class="arrow-right-default"></span>
           </button>
         </div>
       </div>
+      <!--景點列表-->
       <div class="attractions">
         <div class="attractions-group"></div>
       </div>
     </main>
+    <!--表尾-->
     <footer>
-      <div><h6>COPYRIGHT © 2021 台北一日遊</h6></div>
+      <div><h2>COPYRIGHT © 2021 台北一日遊</h2></div>
     </footer>
     <script src="/static/js/script.js" defer></script>
   </body>
