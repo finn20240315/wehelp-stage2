@@ -94,25 +94,24 @@ div.for-nav {
   max-width: 1180px;
   width: 100%;
   height: 149px;
-  gap: 25px;
-  padding: 10px;
+  gap: 20px;
+  padding: 10px 25px;
   display: flex;
   flex-direction: column;
   justify-content: start;
   align-items: start;
 }
 .slogan h2 {
-  margin: 0;
-  padding: 0;
-  font-size: 36px;
+  margin: 0 0 10px 0;
+  font-size: 28px;
   font-weight: 700;
   color: #ffffff;
   text-align: left;
 }
 .slogan h4 {
-  margin: 0;
+  margin: 0 0 5px 0;
   padding: 0;
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 700;
   color: #ffffff;
   text-align: left;
@@ -131,7 +130,7 @@ div.for-nav {
   height: 46px;
   width: 400px;
   text-align: left;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   border-radius: 5px 0px 0px 5px;
   box-shadow: none;
@@ -165,7 +164,7 @@ main {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 10px;
+  padding: 10px 35px 0 35px; /* 上下內距 10px，左右內距 35px */
   cursor: pointer; /* 當滑鼠移入時變成手指 */
 }
 
@@ -180,6 +179,7 @@ main {
   -ms-overflow-style: none; /* 隱藏滾動條 (IE & Edge) */
   margin: 0 20px; /* 左右內距 */
   cursor: pointer; /* 當滑鼠移入時變成手指 */
+  padding-right: 10px;
 }
 
 /* 隱藏滾動條 (Chrome & Safari) */
@@ -191,13 +191,14 @@ main {
   display: flex; /* 讓 <li> 橫向排列 */
   gap: 10px; /* 項目間距 */
   padding: 0;
+  padding-right: 10px;
   margin: 0;
   list-style: none;
   cursor: pointer; /* 當滑鼠移入時變成手指 */
 }
 
 .listitem {
-  padding: 8px 12px;
+  padding: 13px 10px;
   white-space: nowrap; /* 防止站名換行 */
   height: 24px;
   list-style: none;
@@ -206,6 +207,7 @@ main {
   justify-content: center;
   align-items: center;
   cursor: pointer; /* 當滑鼠移入時變成手指 */
+  margin-right: 20px;
 }
 
 /* 左右按鈕樣式 */
@@ -309,9 +311,9 @@ button {
 }
 .attraction p.details {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  padding: 0px;
+  padding: 0 10px;
   margin: 0px;
 }
 .attraction p.mrt {
@@ -398,7 +400,7 @@ footer h2 {
     flex-direction: column;
     justify-content: start;
     align-items: start;
-    padding: 20px;
+    padding: 0 20px;
     gap: 10px;
   }
   .slogan h2 {
@@ -412,18 +414,21 @@ footer h2 {
     font-size: 16px; /* 縮小字體 */
   }
 
-  .search-bar {
+  div.search-bar {
     font-size: 16px;
     display: flex;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
-    width: 80%;
+    width: 100%;
     max-width: 500px;
     padding: 0px;
+    margin: 0px;
+    gap: 0px;
   }
   .search-bar .input {
     height: 40px;
     font-size: 14px;
+    margin: 10px 0px;
     padding: 5px 10px;
     border-radius: 5px 0px 0px 5px;
     box-shadow: none;
@@ -450,6 +455,7 @@ footer h2 {
     background-position: center;
   }
   main {
+    margin: 10px 0 0 0;
     padding-top: 20px; /* 讓內容不會被導覽列擋住 */
   }
   /* 捷運站選單 */
@@ -465,8 +471,7 @@ footer h2 {
     width: 100%;
     overflow-x: auto; /* 允許橫向滾動 */
     display: flex;
-    justify-content: center;
-    margin: 0px 10px; /* 左右內距 */
+    margin: 0px 10px 10px 10px; /* 左右內距 */
     cursor: pointer; /* 當滑鼠移入時變成手指 */
   }
 
@@ -483,6 +488,7 @@ footer h2 {
   .listitem {
     font-size: 16px;
     cursor: pointer; /* 當滑鼠移入時變成手指 */
+    margin: 0 10px 0 0;
   }
 
   .attractions {
