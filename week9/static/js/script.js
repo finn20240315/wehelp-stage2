@@ -160,6 +160,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     card.appendChild(name);
     card.appendChild(details);
 
+    // 在景點卡片上添加點擊事件，點擊後跳轉到相應的景點詳細頁面
+    card.addEventListener("click", () => {
+      window.location.href = `/attraction/${place.id}`;
+      console.log("已點擊景點卡片:", place.id);
+    });
+
     return card;
   }
 

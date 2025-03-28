@@ -1,11 +1,15 @@
 from fastapi import FastAPI, Request
+# FastAPI：主要的 Web 框架，負責建立 API 伺服器
+# Request：用來處理 HTTP 請求，獲取請求相關資訊
 from fastapi.responses import FileResponse ,JSONResponse
-from typing import Optional
-import json
-import mysql.connector # 與 MySQL 資料庫建立連線
+# FileResponse：用來回傳靜態 HTML 檔案，例如首頁或其他網頁
+# JSONResponse：回傳 JSON 格式的資料，適用於 API
+from typing import Optional #Optional：用來定義參數為可選（非必填）。例如：Optional[str] 代表參數可以是字串或是 None
+import json # 處理 JSON 格式的資料
+import mysql.connector # 與 MySQL 資料庫建立連線，查詢景點資訊
 import os # 操作檔案系統，如 os.path.dirname(__file__) 取得目前檔案所在的目錄
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware # 解決 CORS（跨來源請求） 問題，允許前端從不同網域存取 API
+from fastapi.staticfiles import StaticFiles #
 
 # 建立 FastAPI 應用程式，這將是我們的 API 伺服器
 app=FastAPI()
