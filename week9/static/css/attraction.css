@@ -86,7 +86,12 @@ div.for-nav {
   font-weight: 500;
 }
 
-hr.separator {
+hr.separator-1 {
+  width: 100%;
+  border: 1px solid #e8e8e8;
+  margin: 0 auto;
+}
+hr.separator-2 {
   max-width: 1920px;
   width: 100%;
   border: 1px solid #e8e8e8;
@@ -384,12 +389,16 @@ footer h2 {
     width: 100%;
     height: 100%;
     padding: 0;
+    margin: 0 0 40px 0;
   }
   .profile {
     width: 100%;
     height: 100%;
     padding: 20px;
     margin: 0;
+  }
+  .img-container {
+    border-radius: 0;
   }
   .picture_current {
     width: 100%;
