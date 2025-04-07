@@ -23,7 +23,7 @@ cursor = conn.cursor()
 # 建立資料表（如果不存在）
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS attractions (
-    id INT PRIMARY KEY AUTO_INCREMENT, # 主鍵，自動遞增
+    id INT PRIMARY KEY AUTO_INCREMENT, 
     name VARCHAR(255) NOT NULL,
     category VARCHAR(255),
     description TEXT,
@@ -71,4 +71,21 @@ if count == 0:
 else:
     print("資料表已經有資料，不執行插入。")
 
+# 創建 member 資料表
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS member(
+               id INT PRIMARY KEY AUTO_INCREMENT,
+               username VARCHAR(255) NOT NULL, 
+               email VARCHAR(255) NOT NULL UNIQUE,
+               password VARCHAR(255) NOT NULL,
+               time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+               );
+""")
+# UNIQUE 確保資料不能重複
 
+conn.commit()
+print("資料表 member 建立成功！")
+
+cursor.close() # cursor 是用來執行 SQL 指令 
+conn.close() # 資料庫連線 (connection) 物件
+print("資料庫已關閉離線！")

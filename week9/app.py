@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request,HTTPException,Depends
 # FastAPI：主要的 Web 框架，負責建立 API 伺服器
 # Request：用來處理 HTTP 請求，獲取請求相關資訊
 from fastapi.responses import FileResponse ,JSONResponse
@@ -10,9 +10,15 @@ import mysql.connector # 與 MySQL 資料庫建立連線，查詢景點資訊
 import os # 操作檔案系統，如 os.path.dirname(__file__) 取得目前檔案所在的目錄
 from fastapi.middleware.cors import CORSMiddleware # 解決 CORS（跨來源請求） 問題，允許前端從不同網域存取 API
 from fastapi.staticfiles import StaticFiles #
+import jwt
+import datetime
+
+# === JWT 設定 ===
+JWT_SECRET = "my-secret-key"
 
 # 建立 FastAPI 應用程式，這將是我們的 API 伺服器
 app=FastAPI()
+
 #####################################################################
 # 設置 CORS 允許來自特定來源的請求
 app.add_middleware(
@@ -92,15 +98,6 @@ async def get_attractions(page: int = 0, keyword: Optional[str] = None):
     cursor.execute(sql, params)
     results = cursor.fetchall()
 
-    # if keyword:
-    #     sql += " WHERE name LIKE %s OR mrt LIKE %s"
-    #     search_keyword = f"%{keyword}%"
-    #     cursor.execute(sql + " LIMIT %s OFFSET %s", (search_keyword, search_keyword, limit, offset))
-    # else:
-    #     cursor.execute(sql + " LIMIT %s OFFSET %s", (limit, offset))
-
-    # results = cursor.fetchall()
-
     for attraction in results:
         attraction["images"] = json.loads(attraction["images"])  
 
@@ -114,18 +111,6 @@ async def get_attractions(page: int = 0, keyword: Optional[str] = None):
     
     total_count = cursor.fetchone()["COUNT(*)"]
     next_page = page + 1 if total_count > (offset + limit) else None
-
-
-    # # 重新計算 total_count (根據 keyword 來查詢總數)
-    # if keyword:
-    #     cursor.execute("SELECT COUNT(*) FROM attractions WHERE name LIKE %s OR mrt LIKE %s", (search_keyword, search_keyword))
-    # else:
-    #     cursor.execute("SELECT COUNT(*) FROM attractions")
-
-    # total_count = cursor.fetchone()["COUNT(*)"]
-
-    # # 只有當有查詢結果時才決定 nextPage
-    # next_page = page + 1 if total_count > (offset + limit) and results else None
 
     cursor.close()
     conn.close()
@@ -199,6 +184,122 @@ async def get_mrts():
 
     # 只回傳捷運站名稱（依景點數排序）
     return JSONResponse({"data": [mrt["mrt"] for mrt in mrt_stations]})  # 只回傳捷運站名稱
+
+#     1. 前端提供輸入框，讓使用者輸入會員帳號密碼
+#     2. 將前端樹入的資料傳到後端，存到資料庫
+#     3. 當使用者要登入時，去資料庫撈資料看是否吻合
+#     4. 如果吻合就讓使用者登入
+#     5. 之後在使用者瀏覽網站的每個畫面都保持登入，直到過了使用期限或者使用者自己登出
+
+# 註冊一個新的會員
+@app.post("/api/user")
+async def signup(request:Request):
+    try:
+        body=await request.json()
+        print(body)  # 調試訊息
+        name=body.get("name")
+        email=body.get("email")
+        password=body.get("password")
+
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="0000",
+            database="taipei_day_trip",
+            charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
+        )
+        cursor = conn.cursor(dictionary=True)
+        
+        # 檢查帳號是否已存在
+        cursor.execute("SELECT email FROM member WHERE email = %s", (email,))
+        if cursor.fetchone():
+            return JSONResponse(content={"error":True,"message": "使用者信箱已被註冊"}, status_code=400)
+                
+        # 新增使用者
+        cursor.execute("INSERT INTO member(username,email, password) VALUES (%s, %s, %s)", (name, email, password))
+        conn.commit()
+        
+        return JSONResponse(content={"ok":True,"message": "註冊成功"}, status_code=200)
+    
+    except Exception as e:
+        print(f"註冊錯誤: {e}")  # 調試訊息
+        return JSONResponse(content={"error":str(e)},status_code=500)
+    
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
+# 取得當前登入的會員資訊
+@app.get("/api/user/auth")
+async def get_current_user(request: Request):
+    conn=None
+    cursor=None
+    try:
+        token = request.headers.get("Authorization").split(" ")[1]  # 取得 Bearer Token
+        if token is None:
+            return JSONResponse({"data":None},status_code=401)
+        
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        id = payload.get("id")
+        name = payload.get("name")
+        email = payload.get("email")
+
+        return {"data": {"id": id, "name": name, "email": email}}
+
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token 已過期")
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="無效的 token")
+    finally:
+        if cursor:cursor.close()
+        if conn:conn.close()
+
+# 登入會員帳戶
+@app.put("/api/user/auth")
+async def signin(request:Request):
+    try:
+        body = await request.json()  # 解析 JSON
+        print(data)  # 調試訊息
+
+        email=body.get("email")
+        password=body.get("password")
+
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="0000",
+            database="taipei_day_trip",
+            charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
+        )
+        cursor = conn.cursor(dictionary=True)
+        
+        # 驗證帳號密碼
+        cursor.execute("SELECT id,username, email,password FROM member WHERE email=%s AND password=%s", (email,password))
+        user = cursor.fetchone()
+        print("user:",user)  # 調試訊息
+
+        if user is None:
+            return JSONResponse({"error":True, "message": "帳號或密碼錯誤"}, status_code=400)
+        
+        payload={
+            "data":{
+                "id" : user["id"],
+                "name":user["username"],
+                "email":user["email"],
+            },
+            "exp":datetime.datetime.now()+datetime.timedelta(days=7) # 7天後過期
+        }
+        token = jwt.encode(payload,JWT_SECRET,algorithm="HS256")
+
+        return JSONResponse({"token":token},status_code=200)
+    
+    except Exception as e:
+        print(f"登入錯誤: {e}")  # 調試訊息
+        return JSONResponse(content={"error":str(e)},status_code=500)
+    
+    finally:
+        if cursor : cursor.close()
+        if conn : conn.close()
 
 # 掛載靜態資源
 app.mount("/static", StaticFiles(directory="static"), name="static")

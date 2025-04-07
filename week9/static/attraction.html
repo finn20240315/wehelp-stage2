@@ -13,6 +13,67 @@
     />
   </head>
   <body>
+    <!-- 註冊彈跳視窗 -->
+    <div class="pop-up-area" id="pop-up-area">
+      <div class="signUpFormContainer" id="signUpFormContainer">
+        <div class="color"></div>
+        <div class="box">
+          <span class="closeSignUpForm" id="closeSignUpForm">&times;</span>
+          <form id="signUpForm">
+            <h2>註冊會員帳號</h2>
+            <input
+              type="text"
+              id="signup_username"
+              name="signup_username"
+              class="input"
+              placeholder="輸入姓名"
+              required
+            />
+            <input
+              type="email"
+              id="signup_email"
+              name="signup_email"
+              class="input"
+              placeholder="輸入電子郵件"
+              required
+            />
+            <input
+              type="password"
+              id="signup_password"
+              name="signup_password"
+              class="input"
+              placeholder="輸入密碼"
+              required
+            />
+            <button type="submit" class="submit-btn">註冊新帳戶</button>
+            <div class="message_signup" id="message_signup"></div>
+            已經有帳戶了?<a href="#" id="signInLink">點此登入</a>
+          </form>
+          <form id="signInForm">
+            <h2>登入會員帳號</h2>
+            <input
+              type="email"
+              id="signin_email"
+              name="signin_email"
+              class="input"
+              placeholder="輸入電子信箱"
+              required
+            />
+            <input
+              type="password"
+              id="signin_password"
+              name="signin_password"
+              class="input"
+              placeholder="輸入密碼"
+              required
+            />
+            <button type="submit" class="submit-btn">登入帳戶</button>
+            <div class="message_signin" id="message_signin"></div>
+            還沒有帳戶?<a href="#" id="signUpLink">點此註冊</a>
+          </form>
+        </div>
+      </div>
+    </div>
     <header>
       <!--表頭-->
       <nav>
@@ -95,5 +156,6 @@
       <div><h2>COPYRIGHT © 2021 台北一日遊</h2></div>
     </footer>
     <script src="/static/js/attraction.js" defer></script>
+    <script src="/static/js/login.js"></script>
   </body>
 </html>
