@@ -41,7 +41,7 @@ document.querySelector(".sign-in").addEventListener("click", () => {
 signUpForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const username = document.querySelector("#signup_username").value.trim();
+  const name = document.querySelector("#signup_username").value.trim();
   const email = document.querySelector("#signup_email").value.trim();
   const password = document.querySelector("#signup_password").value.trim();
 
@@ -52,7 +52,7 @@ signUpForm.addEventListener("submit", async (event) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: username,
+        name: name,
         email: email,
         password: password,
       }),
@@ -73,10 +73,8 @@ signUpForm.addEventListener("submit", async (event) => {
 signInForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const signin_email = document.getElementById("signin_email").value.trim();
-  const signin_password = document
-    .getElementById("signin_password")
-    .value.trim();
+  const email = document.getElementById("signin_email").value.trim();
+  const password = document.getElementById("signin_password").value.trim();
 
   if (!signin_email || !signin_password) {
     showMessage("請填寫所有欄位！", "error", "signin");
@@ -89,8 +87,8 @@ signInForm.addEventListener("submit", async (event) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        signin_email,
-        signin_password,
+        email: email,
+        password: password,
       }),
     });
 
@@ -117,6 +115,7 @@ signInForm.addEventListener("submit", async (event) => {
   }
 });
 
+// 取得當前登入的會員資訊
 document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("token");
   console.log("token:", token); // 確認 token 是否存在
@@ -135,6 +134,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const signInBtn = document.querySelector(".sign-in");
   signInBtn.textContent = "";
   signInBtn.textContent = "登出";
+  
   signInBtn.addEventListener("click", async () => {
     popUpArea.style.display = "none"; // 隱藏黑色遮罩
     signUpFormContainer.style.display = "none"; // 隱藏登入表單

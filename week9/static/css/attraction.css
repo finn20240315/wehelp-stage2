@@ -40,11 +40,12 @@ body {
   background: rgba(0, 0, 0, 0.5);
   z-index: 1;
 }
-
+.signUpFormContainer h2 {
+  margin: 0 0 20px 0;
+}
 /* 彈跳視窗本體 */
 .signUpFormContainer {
   background: white;
-  padding: 20px;
   border-radius: 5px;
   box-shadow: 0px 0px 10px rgba(170, 170, 170, 1);
   text-align: center;
@@ -55,11 +56,22 @@ body {
   top: 80px;
   left: 50%;
   transform: translateX(-50%);
+  display: none; /* 預設隱藏 */
+}
+.color {
+  background-color: rgba(51, 119, 136, 1);
+  height: 10px;
+  width: 100%;
+  z-index: 4;
+  border-radius: 5px 5px 0 0;
+}
+.box {
+  padding: 20px;
 }
 .closeSignUpForm {
   position: absolute;
   top: 10px;
-  right: 20px;
+  right: 10px;
   font-size: 30px;
   cursor: pointer;
 }
@@ -92,6 +104,16 @@ body {
   z-index: 3;
   font-size: 19px;
   font-weight: 400;
+}
+.message_signin,
+.message_signup {
+  margin: 10px;
+}
+a#signUpLink,
+a#signInLink {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
 }
 
 /*header表頭*/

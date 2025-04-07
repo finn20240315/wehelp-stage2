@@ -197,11 +197,9 @@ async def signup(request:Request):
     try:
         body=await request.json()
         print(body)  # 調試訊息
-        username=body.get('username')
-        email=body.get('email')
-        password=body.get('password')
-
-        print(f"正在處理註冊:{password}, {username}, {email}")  # 調試訊息
+        name=body.get("name")
+        email=body.get("email")
+        password=body.get("password")
 
         conn = mysql.connector.connect(
             host="localhost",
@@ -218,7 +216,7 @@ async def signup(request:Request):
             return JSONResponse(content={"error":True,"message": "使用者信箱已被註冊"}, status_code=400)
                 
         # 新增使用者
-        cursor.execute("INSERT INTO member(username,email, password) VALUES (%s, %s, %s)", (username, email, password))
+        cursor.execute("INSERT INTO member(username,email, password) VALUES (%s, %s, %s)", (name, email, password))
         conn.commit()
         
         return JSONResponse(content={"ok":True,"message": "註冊成功"}, status_code=200)
@@ -243,11 +241,10 @@ async def get_current_user(request: Request):
         
         payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
         id = payload.get("id")
-        username = payload.get("username")
+        name = payload.get("name")
         email = payload.get("email")
-        password = payload.get("password")
 
-        return {"data": {"id": id, "name": username, "email": email, "password": password}}
+        return {"data": {"id": id, "name": name, "email": email}}
 
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token 已過期")
@@ -261,11 +258,11 @@ async def get_current_user(request: Request):
 @app.put("/api/user/auth")
 async def signin(request:Request):
     try:
-        data = await request.json()  # 解析 JSON
+        body = await request.json()  # 解析 JSON
         print(data)  # 調試訊息
 
-        email=data.get("signin_email")
-        password=data.get("signin_password")
+        email=body.get("email")
+        password=body.get("password")
 
         conn = mysql.connector.connect(
             host="localhost",
@@ -285,10 +282,11 @@ async def signin(request:Request):
             return JSONResponse({"error":True, "message": "帳號或密碼錯誤"}, status_code=400)
         
         payload={
-            "id" : user["id"],
-            "username":user["username"],
-            "email":user["email"],
-            "password":user["password"],
+            "data":{
+                "id" : user["id"],
+                "name":user["username"],
+                "email":user["email"],
+            },
             "exp":datetime.datetime.now()+datetime.timedelta(days=7) # 7天後過期
         }
         token = jwt.encode(payload,JWT_SECRET,algorithm="HS256")
