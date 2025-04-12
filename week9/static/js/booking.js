@@ -13,6 +13,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     let userName = "";
     const payload = jwt_decode(token);
     userName = payload.data.name;
+    email = payload.data.email;
 
     console.log("準備發送 fetch");
     const response = await fetch("/api/booking", {
@@ -50,6 +51,8 @@ window.addEventListener("DOMContentLoaded", async () => {
       document.querySelector(
         "span.total"
       ).textContent = `新台幣 ${data.data.price} 元`;
+      document.querySelector("input.contact-name").placeholder = userName;
+      document.querySelector("input.contact-email").placeholder = email;
     } else {
       console.log("目前沒有預定行程");
       document.querySelector(".headline-2").textContent = userName;
@@ -79,4 +82,3 @@ window.addEventListener("DOMContentLoaded", async () => {
     console.error("Fetch 發生錯誤：", error);
   }
 });
-

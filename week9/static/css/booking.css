@@ -356,8 +356,10 @@ footer h2 {
   font-size: 16px;
 }
 @media (max-width: 1024px) {
-  .taipei-trip {
+  nav .taipei-trip {
     padding: 15px;
+    white-space: nowrap;
+    font-size: 24px;
   }
   main {
     padding: 0 15px;
