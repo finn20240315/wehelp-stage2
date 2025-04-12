@@ -1,0 +1,398 @@
+/*全域設定*/
+* {
+  /* border: 1px red solid; */
+  box-sizing: border-box; /* 計算寬度時包含邊框和內距 */
+}
+html {
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+body {
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  height: 100%;
+  font-family: "Noto Sans TC", sans-serif; /* 設定字型 */
+  font-weight: 700; /* 粗體 */
+  color: #666666;
+  font-size: 16px; /* 字體大小 */
+}
+/*電腦版 1920px*/
+
+#signUpForm {
+  display: none;
+}
+/* 背景遮罩 */
+.pop-up-area {
+  display: flex; /* 預設顯示 */
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+.signUpFormContainer h2 {
+  margin: 0 0 20px 0;
+}
+/* 彈跳視窗本體 */
+.signUpFormContainer {
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgba(170, 170, 170, 1);
+  text-align: center;
+  width: 340px;
+  height: 275;
+  z-index: 2;
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none; /* 預設隱藏 */
+}
+.color {
+  background-color: rgba(51, 119, 136, 1);
+  height: 10px;
+  width: 100%;
+  z-index: 4;
+  border-radius: 5px 5px 0 0;
+}
+.box {
+  padding: 20px;
+}
+.closeSignUpForm {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 30px;
+  cursor: pointer;
+}
+.input {
+  width: 310px;
+  height: 47px;
+  border-radius: 5px;
+  padding: 15px;
+  border: 1px solid rgba(204, 204, 204, 1);
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 10px 0;
+}
+.message {
+  color: red;
+  display: none;
+  margin: 0 0 10px 0;
+}
+/* 登入按鈕 */
+.submit-btn {
+  padding: 10px 20px;
+  background: rgba(68, 136, 153, 1);
+  color: white;
+  border: none;
+  cursor: pointer;
+  width: 310px;
+  height: 46px;
+  border-radius: 5px;
+  margin: 0 0 10px 0;
+  z-index: 3;
+  font-size: 19px;
+  font-weight: 400;
+}
+.message_signin,
+.message_signup {
+  margin: 10px;
+}
+a#signUpLink,
+a#signInLink {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/*header表頭*/
+.taipei-trip-link {
+  text-decoration: none;
+  display: inline-block;
+  width: 100%;
+}
+nav {
+  padding: 15px;
+  max-width: 1200px;
+  width: 100%;
+  height: 54px;
+  margin: 0 auto; /* 左右自動調整，使元素水平居中 */
+}
+nav div {
+  width: 100%; /* 讓導航欄撐滿畫面 */
+  max-width: 1200px; /* 最大寬度 1200px */
+  height: 34px; /* 高度 34px */
+  display: flex; /* 使用 Flexbox 排版 */
+  justify-content: space-between; /* 讓子元素左右對齊 */
+  align-items: center; /* 垂直置中 */
+}
+
+nav .taipei-trip {
+  color: #448899;
+  max-width: fit-content;
+  max-height: fit-content;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 34px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+div.for-nav {
+  width: auto;
+}
+
+.nav-container .appointment {
+  text-align: center; /* 文字置中 */
+  white-space: nowrap; /* 防止文字換行 */
+  padding: 10px;
+  cursor: pointer;
+}
+
+.nav-container .sign-in {
+  text-align: center; /* 文字置中 */
+  white-space: nowrap; /* 防止文字換行 */
+  padding: 10px;
+  cursor: pointer;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+}
+
+.nav-container button h4 {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+hr.separator-1 {
+  width: 100%;
+  border: 1px solid #e8e8e8;
+  margin: 0 auto;
+}
+
+/* main */
+main {
+  max-width: 1000px;
+  width: 100%;
+  padding: 0 15px;
+  margin: 0 auto;
+}
+/*預定資訊*/
+.headline {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0 15px;
+  margin: 40px 0 30px 0;
+}
+.headline-1,
+.headline-2,
+.headline-3 {
+  margin: 0;
+  font-weight: 700;
+}
+.section {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin: auto 0;
+  padding: 0 25px;
+  max-width: 1200px;
+  width: auto;
+}
+.picture {
+  margin: 0 30px 0 0;
+}
+.infor {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  position: relative;
+  max-width: 700px;
+  width: 100%;
+  margin: -10px 0;
+}
+img {
+  width: 270px;
+  height: 220px;
+}
+.delete {
+  background-image: url("/static/images/delete.png");
+  width: 30px;
+  height: 30px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+}
+.frame {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 5px 0;
+}
+p.main-title {
+  font-weight: 700;
+  font-size: 16px;
+  color: rgba(68, 136, 153, 1);
+  padding: 0;
+  margin: 5px auto 10px 5px;
+}
+p {
+  font-weight: 400;
+}
+p.title,
+p.slogan {
+  font-weight: 700;
+}
+p.title,
+p.date,
+p.time,
+p.price,
+p.address {
+  margin: 5px;
+}
+/*聯絡資訊*/
+.contact-form,
+.payment-form {
+  margin: 20px 30px;
+}
+.bold {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 10px 0;
+}
+.field {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+input {
+  width: 200px;
+  height: 38px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 10px;
+  color: black;
+  border: 1px solid rgba(232, 232, 232, 1);
+}
+input::placeholder {
+  color: black;
+}
+hr.separator-2,
+hr.separator-3,
+hr.separator-4 {
+  margin: 40px auto;
+  width: 100%;
+  max-width: 1000px;
+  box-sizing: border-box;
+  border: 1px solid rgba(232, 232, 232, 1);
+}
+.confirm {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  margin: 0px 30px 80px 30px;
+  width: calc(100%-60px);
+  box-sizing: border-box;
+}
+p.total {
+  margin: 0 0 10px 0;
+  font-weight: 700;
+}
+button.pay {
+  background-color: rgba(68, 136, 153, 1);
+  color: white;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 19px;
+  width: 173px;
+  height: 36px;
+  padding: 10px 20px;
+  line-height: 18px; /* 垂直置中用這招 */
+  text-align: center;
+}
+p.none {
+  margin: 0 0 50px 0;
+}
+/*表尾*/
+footer {
+  background-color: #757575;
+  height: 104px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+footer h2 {
+  font-size: 16px;
+}
+@media (max-width: 1024px) {
+  .taipei-trip {
+    padding: 15px;
+  }
+  main {
+    padding: 0 15px;
+  }
+  .headline {
+    padding: 0 15px;
+  }
+  .section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+  }
+  .picture {
+    width: 100%;
+  }
+  .img {
+    width: 100%;
+    height: auto;
+  }
+  .contact-form,
+  .payment-form {
+    margin: 20px 0;
+  }
+  .infor {
+    width: 100%;
+    position: relative;
+    margin: 20px 0 0 0;
+  }
+  .delete {
+    position: absolute;
+    top: auto;
+    bottom: -30px;
+    right: 30px;
+    cursor: pointer;
+  }
+}

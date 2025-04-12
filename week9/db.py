@@ -86,6 +86,26 @@ CREATE TABLE IF NOT EXISTS member(
 conn.commit()
 print("資料表 member 建立成功！")
 
-cursor.close() # cursor 是用來執行 SQL 指令 
-conn.close() # 資料庫連線 (connection) 物件
+
+# 創建 booking 資料表
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS booking( 
+               id INT PRIMARY KEY AUTO_INCREMENT,
+               user_id INT NOT NULL, -- 對應到 member.id
+               attraction_id INT NOT NULL, -- 對應到 attractions.id
+               date DATE NOT NULL, -- 預定要去的日期
+               time VARCHAR(255) NOT NULL, -- 預定時段：上半天或下半天
+               price INT NOT NULL, -- 價格
+               status VARCHAR(255) DEFAULT 'unconfirmed', -- 訂單狀態：unconfirmed, confirmed, canceled
+               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 訂單建立時間
+               FOREIGN KEY (user_id) REFERENCES member(id), -- 外鍵，對應到 member 資料表的 id
+               FOREIGN KEY (attraction_id) REFERENCES attractions(id) -- 外鍵，對應到 attractions 資料表的 id
+               );
+""")
+conn.commit()
+print("資料表 booking 建立成功！")
+
+cursor.close()
+conn.close()
+
 print("資料庫已關閉離線！")

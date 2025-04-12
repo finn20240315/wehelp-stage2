@@ -160,12 +160,14 @@ div.for-nav {
   text-align: center; /* 文字置中 */
   white-space: nowrap; /* 防止文字換行 */
   padding: 10px;
+  cursor: pointer;
 }
 
 .nav-container .sign-in {
   text-align: center; /* 文字置中 */
   white-space: nowrap; /* 防止文字換行 */
   padding: 10px;
+  cursor: pointer;
 }
 
 .nav-container {
@@ -340,6 +342,7 @@ button.booking {
   color: white;
   border-radius: 5px;
   font-size: 19px;
+  cursor: pointer;
 }
 .field-date,
 .field-time,
