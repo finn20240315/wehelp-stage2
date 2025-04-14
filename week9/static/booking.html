@@ -1,11 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking</title>
-</head>
-<body>
-  
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Booking</title>
+    <link rel="stylesheet" href="/static/css/booking.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- 註冊彈跳視窗 -->
+    <div class="pop-up-area" id="pop-up-area">
+      <div class="signUpFormContainer" id="signUpFormContainer">
+        <div class="color"></div>
+        <div class="box">
+          <span class="closeSignUpForm" id="closeSignUpForm">&times;</span>
+          <form id="signUpForm">
+            <h2>註冊會員帳號</h2>
+            <input
+              type="text"
+              id="signup_username"
+              name="signup_username"
+              class="input"
+              placeholder="輸入姓名"
+              required
+            />
+            <input
+              type="email"
+              id="signup_email"
+              name="signup_email"
+              class="input"
+              placeholder="輸入電子郵件"
+              required
+            />
+            <input
+              type="password"
+              id="signup_password"
+              name="signup_password"
+              class="input"
+              placeholder="輸入密碼"
+              required
+            />
+            <button type="submit" class="submit-btn">註冊新帳戶</button>
+            <div class="message_signup" id="message_signup"></div>
+            已經有帳戶了?<a href="#" id="signInLink">點此登入</a>
+          </form>
+          <form id="signInForm">
+            <h2>登入會員帳號</h2>
+            <input
+              type="email"
+              id="signin_email"
+              name="signin_email"
+              class="input"
+              placeholder="輸入電子信箱"
+              required
+            />
+            <input
+              type="password"
+              id="signin_password"
+              name="signin_password"
+              class="input"
+              placeholder="輸入密碼"
+              required
+            />
+            <button type="submit" class="submit-btn">登入帳戶</button>
+            <div class="message_signin" id="message_signin"></div>
+            還沒有帳戶?<a href="#" id="signUpLink">點此註冊</a>
+          </form>
+        </div>
+      </div>
+    </div>
+    <header>
+      <!--表頭-->
+      <nav>
+        <div>
+          <a href="/" class="taipei-trip-link">
+            <div class="taipei-trip">台北一日遊</div>
+          </a>
+          <div class="nav-container">
+            <div class="for-nav">
+              <div class="appointment">預定行程</div>
+            </div>
+            <div class="for-nav">
+              <div class="sign-in">登入/註冊</div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <hr class="separator-1" />
+    </header>
+    <!-- 主要內容 -->
+    <main>
+      <div class="headline">
+        <p class="headline-1">您好，</p>
+        <p class="headline-2"></p>
+        <p class="headline-3">，待預訂的行程如下：</p>
+      </div>
+      <main class="none">
+        <div class="section">
+          <div class="picture">
+            <img class="img" src="/static/images/picture.png" alt="商品主圖" />
+          </div>
+          <div class="infor">
+            <icon class="delete"></icon>
+            <div class="frame">
+              <p class="main-title">台北一日遊：</p>
+              <p class="main-title name"></p>
+            </div>
+            <div class="frame">
+              <p class="title">日期：</p>
+              <p class="date"></p>
+            </div>
+            <div class="frame">
+              <p class="title">時間：</p>
+              <p class="time"></p>
+            </div>
+            <div class="frame">
+              <p class="title">費用：</p>
+              <p class="price"></p>
+            </div>
+            <div class="frame">
+              <p class="title">地點：</p>
+              <p class="address"></p>
+            </div>
+          </div>
+        </div>
+        <hr class="separator-2" />
+        <div class="contact-form">
+          <p class="contact-title bold">您的聯絡資訊</p>
+          <div class="field">
+            <p class="title-name">聯絡姓名：</p>
+            <input type="text" class="contact-name" placeholder="王大明" />
+          </div>
+          <div class="field">
+            <p class="title-email">連絡信箱：</p>
+            <input
+              type="email"
+              class="contact-email"
+              placeholder="123@email.com"
+            />
+          </div>
+          <div class="field">
+            <p class="title-phone">手機號碼：</p>
+            <input
+              type="number"
+              class="contact-phone"
+              placeholder="0900-111-222"
+            />
+          </div>
+          <p class="slogan">
+            請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。
+          </p>
+        </div>
+        <hr class="separator-3" />
+        <div class="payment-form">
+          <p class="payment-card bold">信用卡付款資訊</p>
+          <div class="field">
+            <p class="title-name">卡片號碼：</p>
+            <input
+              type="number"
+              class="card-number"
+              placeholder="**** **** **** ****"
+            />
+          </div>
+          <div class="field">
+            <p class="payment-expire">過期時間：</p>
+            <input type="number" class="expire-day" placeholder="MM / YY" />
+          </div>
+          <div class="field">
+            <p class="payment-code">驗證密碼：</p>
+            <input type="number" class="code" placeholder="CVV" />
+          </div>
+        </div>
+        <hr class="separator-4"/>
+        <div class="confirm">
+          <p class="total">總價：<span class="total"></span></p>
+          <button class="pay">確認訂購並付款</button>
+        </div>
+      </main>
+    </main>
+    <!--表尾-->
+    <footer>
+      <div><h2>COPYRIGHT © 2021 台北一日遊</h2></div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script src="/static/js/booking.js"></script>
+    <script src="/static/js/login.js"></script>
+  </body>
 </html>

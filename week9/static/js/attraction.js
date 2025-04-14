@@ -1,8 +1,8 @@
 window.addEventListener("DOMContentLoaded", async () => {
   const placeId = window.location.pathname.split("/")[2];
-  const attraction_id = `/api/attraction/${placeId}`;
+  const attraction_url = `/api/attraction/${placeId}`;
   try {
-    const response = await fetch(attraction_id);
+    const response = await fetch(attraction_url);
     console.log("抓到的資料：", response);
 
     if (!response.ok) {
@@ -50,11 +50,6 @@ window.addEventListener("DOMContentLoaded", async () => {
       infors.insertBefore(description, addressTitle);
       addressTitle.appendChild(address);
       transportTitle.appendChild(transport);
-
-      // input 日曆的樣式
-      document
-        .querySelector(".calendar")
-        .setAttribute("placeholder", "yyyy/mm/dd");
 
       // radio 的樣式
       const radios = document.querySelectorAll(".radio");
@@ -131,4 +126,66 @@ window.addEventListener("DOMContentLoaded", async () => {
   } catch (error) {
     console.error("載入資料失敗", error);
   }
+
+  // week13
+  // 預訂行程按鈕
+  const bookingBtn = document.querySelector(".booking");
+  const dateInput = document.querySelector(".calendar");
+
+  bookingBtn.addEventListener("click", async (event) => {
+    console.log("📌 booking 按鈕被點擊了！");
+    if (!dateInput.reportValidity()) {
+      return; // 如果驗證不通過，就不要繼續往下執行
+    }
+    
+    const token = localStorage.getItem("token");
+    console.log("token:", token); // 確認 token 是否存在
+
+    if (!token) {
+      signUpFormContainer.style.display = "block";
+      popUpArea.style.display = "block";
+      return;
+    }
+
+    const attraction_id = placeId;
+    const date = document.querySelector(".calendar").value;
+    // if (!date) {
+    //   alert("請選擇日期");
+    //   return;
+    // }
+
+    const time = document
+      .querySelector(".radio:checked")
+      .parentElement.textContent.trim();
+    const price = document.querySelector(".radio:checked").value;
+
+    // 跳轉頁面到 "/booking"
+    // 將表單資料都傳到 api : "/api/booking"
+    await fetch("/api/booking", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        attraction_id: attraction_id,
+        date: date,
+        time: time,
+        price: price,
+      }),
+    });
+
+    window.location.href = "/booking"; // 跳轉到預訂行程頁面
+  });
+
+  document.querySelector(".appointment").addEventListener("click", () => {
+    console.log("點擊到按鈕了！");
+    const token = localStorage.getItem("token");
+    if (!token) {
+      signUpFormContainer.style.display = "block";
+      popUpArea.style.display = "block";
+    } else {
+      window.location.href = "/booking";
+    }
+  });
 });

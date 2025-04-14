@@ -12,6 +12,8 @@ from fastapi.middleware.cors import CORSMiddleware # 解決 CORS（跨來源請�
 from fastapi.staticfiles import StaticFiles #
 import jwt
 import datetime
+from datetime import date
+import json
 
 # === JWT 設定 ===
 JWT_SECRET = "my-secret-key"
@@ -19,7 +21,6 @@ JWT_SECRET = "my-secret-key"
 # 建立 FastAPI 應用程式，這將是我們的 API 伺服器
 app=FastAPI()
 
-#####################################################################
 # 設置 CORS 允許來自特定來源的請求
 app.add_middleware(
     CORSMiddleware,
@@ -51,7 +52,7 @@ async def thankyou(request: Request):
 # Week9
 # 開啟並讀取 taipei-attractions.json 檔案
 with open("data/taipei-attractions.json", "r", encoding="utf-8") as file:
-    data = json.load(file) # 將 JSON 轉換成 Python 字典 (dict)
+     data = json.load(file) # 將 JSON 轉換成 Python 字典 (dict)
 
 # 從 JSON 中提取景點資料：景點資料是一個 列表 (list)
 attractions = data["result"]["results"]
@@ -185,12 +186,7 @@ async def get_mrts():
     # 只回傳捷運站名稱（依景點數排序）
     return JSONResponse({"data": [mrt["mrt"] for mrt in mrt_stations]})  # 只回傳捷運站名稱
 
-#     1. 前端提供輸入框，讓使用者輸入會員帳號密碼
-#     2. 將前端樹入的資料傳到後端，存到資料庫
-#     3. 當使用者要登入時，去資料庫撈資料看是否吻合
-#     4. 如果吻合就讓使用者登入
-#     5. 之後在使用者瀏覽網站的每個畫面都保持登入，直到過了使用期限或者使用者自己登出
-
+# Week12
 # 註冊一個新的會員
 @app.post("/api/user")
 async def signup(request:Request):
@@ -300,6 +296,187 @@ async def signin(request:Request):
     finally:
         if cursor : cursor.close()
         if conn : conn.close()
+
+# Week13
+# 建立預訂 API
+@app.post("/api/booking")
+async def post_booking(request:Request):
+    body=await request.json() # request 是參數：前端用json格式傳來的資料，解析json()
+    print(body)  # 調試訊息
+
+    user_id=body.get("user_id") 
+    attraction_id=body.get("attraction_id")
+    date=body.get("date")
+    time=body.get("time")
+    price=body.get("price")  # 所以前端要 fetch 到一個json資料裡面要有這些資料對吧?
+
+    conn=mysql.connector.connect( # connn 是什麼意思?
+        host="localhost", # # 主機名稱，通常是 localhost
+        user="root", # 使用者名稱，這邊是 root
+        password="0000", # 密碼，這邊是 0000
+        database="taipei_day_trip", # 資料庫名稱，這邊是 taipei_day_trip
+        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
+    )
+    cursor=conn.cursor(dictionary=True) # 這句是什麼意思?
+    
+    token = request.headers.get("Authorization") # token 不是存在 localStorage 裡面嗎?
+     # 我要怎麼看到 request 的資料? print(request) ?
+
+    if token is None: # 如果 token 不存在，代表使用者沒有登入
+    # 要改成 if not token 
+        return JSONResponse({"error":True,"message":"請先登入會員"},status_code=401)
+    # 直接把 login 葉面跳出來顯示
+   
+    try:
+        token = token.split(" ")[1]  # 取得 Bearer Token
+        
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        user_id = payload.get("data").get("id") # 這裡是什麼意思?
+        print(payload)
+
+    except jwt.ExpiredSignatureError: # 這邊在說什麼?
+         return JSONResponse({"error":True,"message":"Token 已過期"},status_code=401)
+
+    except jwt.PyJWTError: # 這邊是什麼?
+        return JSONResponse({"error":True,"message":"無效的 token"},status_code=401)
+    
+    sql = """
+    INSERT INTO booking (user_id, attraction_id, date, time, price)
+    VALUES (%s, %s, %s, %s, %s)
+    """
+    cursor.execute("DELETE FROM booking WHERE user_id = %s", (user_id,))
+
+    cursor.execute(sql, (user_id, attraction_id, date, time, price))
+    conn.commit()  # 提交交易，將資料寫入資料庫
+
+    cursor.close()
+    conn.close()
+
+    return JSONResponse({"ok":True,"message":"預訂成功"},status_code=200)
+    
+# 取得預定資料 API
+@app.get("/api/booking")
+def get_booking(request:Request):
+    # 使用者一進入api就需驗證是否有在header夾帶token
+    # 解析 token 取得 id 是什麼，然後進去 sql booking 撈資料 取得 date time price
+    # 取得 attraction_id 再撈 attraction 資料 ，動態添加 name address image
+    # 將撈到的資料，動態添加到 booking.html 上
+    # (這是order api 的事)在同一個頁面 bookin.html 上，將 聯絡資訊 & 付款資訊也一併存入 sql 裡面 ，再創一個表?
+
+    token=request.headers.get("Authorization")
+    print("token",token)
+    if token is None:
+        return JSONResponse({"error":True,"message":"請先登入會員"},status_code=400)
+    # 為什麼這裡用 jsonresponse token 又不是json 格式
+    # 為什麼這裡是回傳 error:true，而不是回傳 ok:true ? 如果我寫成 if token is true，是不是就回傳 ok:true ?
+
+    # 解析token
+    try:
+        print("token[0]",token.split(" ")[0])
+        print("token[1]",token.split(" ")[1])
+
+        token=token.split(" ")[1]
+        payload=jwt.decode(token, JWT_SECRET,algorithms=["HS256"]) # 這邊是什麼意思?
+        user_id=payload.get("data").get("id") # payload 長什麼樣子?
+        print(payload)
+    except jwt.ExpiredSignatureError: # 這兩個又沒有條件篩選，怎麼知道哪個是 token 過期，哪個是 token 無效?
+        return JSONResponse({"error":True,"message":"token 已過期"},status_code=401)
+    except jwt.PyJWTError:
+        return JSONResponse({"error":True,"message":"無效的 token"},status_code=401)
+    
+    # 這邊是排除了 if token is none、並且嘗試 try (沒有2個 except)才會執行的地方對嗎?
+    conn=mysql.connector.connect(
+        host="localhost",
+        username="root",
+        password="0000",
+        database="taipei_day_trip",
+        charset="utf8mb4"
+    )
+    cursor=conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM booking WHERE user_id=%s",(user_id,))
+    booking = cursor.fetchone()  # <-- 一定要讀出來，不能省
+    # 對資料庫的變更才需要 conn.commit，例如 INSERT、UPDATE、DELETE
+    print("booking 資料：", booking)
+
+    if not booking:
+        cursor.close()
+        conn.close()
+        return {"data":None}
+
+   # 查 attraction 資料
+    attraction_id = booking["attraction_id"]
+    cursor.execute("SELECT id, name, address, images FROM attractions WHERE id=%s", (attraction_id,))
+    attraction = cursor.fetchone()
+    print("！！！attraction['images']是！！！：",attraction["images"])
+    print("！！！attraction['images'][0])是！！！：",attraction["images"][0])
+    print("##################")
+    print(type(attraction["images"]))
+
+
+    if not attraction:
+        cursor.close()
+        conn.close()
+        return {"date":None}
+
+    images=json.loads(attraction["images"])
+    print("json.loads後的資料格式：",images)
+    print(type(images))
+
+    print("第一張圖片網址：",images[0])
+
+    date_str=booking["date"].strftime("%Y-%m-%d")
+
+    return JSONResponse({
+        "data": {
+            "attraction": {
+                "id": attraction["id"],
+                "name": attraction["name"],
+                "address": attraction["address"],
+                "images":images[0] 
+            },
+            "date": date_str,
+            "time": booking["time"],
+            "price": booking["price"]
+        }
+    },status_code=200)
+
+@app.delete("/api/booking")
+def delete_booking(request:Request):
+    token=request.headers.get("Authorization")
+
+    if token is None:
+        return JSONResponse({"error":True,"message":"請先登入會員"},status_code=403)
+   
+    try:
+        token=token.split(" ")[1]
+        payload=jwt.decode(token, JWT_SECRET,algorithms=["HS256"]) # 這邊是什麼意思?
+        user_id=payload.get("data").get("id") # payload 長什麼樣子?
+
+    except jwt.ExpiredSignatureError: # 這兩個又沒有條件篩選，怎麼知道哪個是 token 過期，哪個是 token 無效?
+        return JSONResponse({"error":True,"message":"token 已過期"},status_code=401)
+    except jwt.PyJWTError:
+        return JSONResponse({"error":True,"message":"無效的 token"},status_code=401)
+    
+    conn=mysql.connector.connect(
+        host="localhost",
+        username="root",
+        password="0000",
+        database="taipei_day_trip",
+        charset="utf8mb4"
+    )
+    cursor=conn.cursor(dictionary=True)
+
+    cursor.execute("DELETE FROM booking WHERE user_id=%s",(user_id,))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+    
+    print("資料刪除成功")
+
+    return JSONResponse({"ok":True,"message":"資料刪除成功"},status_code=200)
+
 
 # 掛載靜態資源
 app.mount("/static", StaticFiles(directory="static"), name="static")

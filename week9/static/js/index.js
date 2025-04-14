@@ -187,3 +187,18 @@ window.addEventListener("scroll", () => {
 
 // 首次載入資料
 fetchPlaces(currentPage);
+
+document.querySelector(".appointment").addEventListener("click", () => {
+  console.log("點擊到按鈕了！");
+  const token = localStorage.getItem("token");
+  if (!token) {
+    signUpFormContainer.style.display = "block";
+    popUpArea.style.display = "block";
+  } else {
+    window.location.href = "/booking";
+  }
+});
+
+document.querySelector(".taipei-trip").addEventListener("click", () => {
+  window.location.href = "/";
+});

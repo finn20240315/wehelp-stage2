@@ -140,6 +140,7 @@ nav .taipei-trip {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 
 div.for-nav {
@@ -152,6 +153,7 @@ div.for-nav {
   padding: 10px 20px; /* 增加內距，讓內容有空間 */
   text-align: center; /* 文字置中 */
   white-space: nowrap; /* 防止文字換行 */
+  cursor: pointer;
 }
 
 .nav-container {
@@ -377,6 +379,7 @@ button {
   border-radius: 5px;
   text-align: center;
   position: relative; /* 使得 p 可以相對於 .attraction 定位 */
+  cursor: pointer;
 }
 
 .attraction img {
@@ -455,6 +458,7 @@ footer h2 {
     font-size: 24px; /* 縮小標題字體 */
     text-align: center;
     max-width: fit-content;
+    cursor: pointer;
   }
   .nav-container .appointment {
     max-width: fit-content;
