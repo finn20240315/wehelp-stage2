@@ -14,6 +14,9 @@ import jwt
 import datetime
 from datetime import date
 import json
+import httpx
+import uuid
+# pip install re
 
 # === JWT 設定 ===
 JWT_SECRET = "my-secret-key"
@@ -352,8 +355,15 @@ async def post_booking(request:Request):
     cursor.close()
     conn.close()
 
+    print("Body JSON:", body); # 前端送的 JSON 資料
+    print("Authorization Header:", token); # header 裡拿到的 token
+    print("Decoded Token Payload:", payload); # 解開 token 得到的使用者資訊
+    
     return JSONResponse({"ok":True,"message":"預訂成功"},status_code=200)
     
+
+
+
 # 取得預定資料 API
 @app.get("/api/booking")
 def get_booking(request:Request):
@@ -408,11 +418,6 @@ def get_booking(request:Request):
     attraction_id = booking["attraction_id"]
     cursor.execute("SELECT id, name, address, images FROM attractions WHERE id=%s", (attraction_id,))
     attraction = cursor.fetchone()
-    print("！！！attraction['images']是！！！：",attraction["images"])
-    print("！！！attraction['images'][0])是！！！：",attraction["images"][0])
-    print("##################")
-    print(type(attraction["images"]))
-
 
     if not attraction:
         cursor.close()
@@ -477,6 +482,159 @@ def delete_booking(request:Request):
 
     return JSONResponse({"ok":True,"message":"資料刪除成功"},status_code=200)
 
+# 整體流程：
+# 使用者在 /booking 頁看到信用卡輸入欄位
+# 點擊「確認訂購並付款」→ 取得 TapPay Prime
+# 將 Prime 與訂單資料送到後端 /api/orders
+# 後端建立 UNPAID 訂單 → 發送付款請求給 TapPay
+# 根據付款結果：
+#      成功 → 將訂單標記為 PAID，回傳 order number
+#      失敗 → 保持 UNPAID，仍回傳 order number
+# 前端接收 order number → 導向 /thankyou?number=xxx
+# /thankyou 頁讀取參數 → 顯示訂單號碼
+
+# 前端 booking.js
+# /booking	建立付款按鈕，發送訂單資料與 Prime 給後端
+# /thankyou 從網址取得 order number，顯示訂單成功畫面
+
+# 後端 app.py
+# 後端收到前端送來的 Prime 與訂單資訊
+# 建立訂單（order）	存入資料庫，產生訂單編號
+# 呼叫 TapPay API	用 Prime 發送付款請求
+# 儲存付款紀錄	成功 → 訂單設為 PAID，失敗 → 留 UNPAID
+# 回傳 JSON	包含 order_number
+
+# week14
+# 建立 order API
+@app.post("/api/order")
+async def post_order(request:Request):
+    body = await request.json()
+    print("前端傳來的資料：", body)
+   
+    order_number=str(uuid.uuid4())[:20]
+
+    # 發送 httpx 請求給 TapPay pay by prime api
+    async with httpx.AsyncClient()as client:
+        response=await client.post("https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime",
+            headers= {"Content-Type": "application/json",
+                      "x-api-key": "partner_5lGT3A0K7hnY9sqKvBy8hNwfvWoEQ3ISXgDJxoVGQj2IEeWJAOKawxkj"},
+            json={
+            "prime": body["prime"],
+            "partner_key": "partner_5lGT3A0K7hnY9sqKvBy8hNwfvWoEQ3ISXgDJxoVGQj2IEeWJAOKawxkj",
+            "merchant_id": "shiyingtong2022_CTBC", 
+            "amount": body["order"]["price"],
+            "currency":"TWD",
+            "order_number":order_number,
+            "details":"TapPay Test",
+            "cardholder": {
+                "phone_number": body["order"]["contact"]["phone"],
+                "name": body["order"]["contact"]["name"],
+                "email": body["order"]["contact"]["email"],
+                },
+            "remember": True
+            }
+        )
+        
+        result=response.json()
+        print(response.status_code)  # 200
+        print("從tappay api收到的回傳資料：",result)
+        
+    
+    if result["status"]==0:
+        print("交易成功！")
+    else:
+        return JSONResponse(content={"error": True, "message": "付款失敗"}, status_code=400)
+
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="0000",
+        database="taipei_day_trip",
+        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
+    )
+    cursor = conn.cursor(dictionary=True)
+           
+    token = request.headers.get("Authorization").split(" ")[1]  # 取得 Bearer Token
+    payload = jwt.decode(token,JWT_SECRET,algorithms="HS256")
+    user_id=payload["data"]["id"]
+    print("TOKEN 是  ：",token)
+    print("USER_ID 是 ：",user_id)
+
+    # 新增資料到 member 表 
+    cursor.execute("UPDATE member SET phone = %s WHERE id = %s", (body["order"]["contact"]["phone"],user_id))
+    conn.commit()
+
+    status = None
+    if result["status"] == 0:
+        status="PAID"
+    else:
+        status="UNPAID"
+
+    # 新增訂單資料到 order 表
+    cursor.execute("""
+                   INSERT INTO orders(
+                   user_id,attraction_id,date,time,price,
+                   order_number,status,rec_trade_id
+                   ) VALUES (%s, %s, %s,%s, %s, %s,%s, %s)""",
+                    (user_id,
+                     body["order"]["trip"]["attraction"]["id"],
+                     body["order"]["trip"]["date"], 
+                     body["order"]["trip"]["time"],
+                     body["order"]["price"],
+                     result["order_number"],
+                     status,
+                     result["rec_trade_id"]
+                     ))
+    conn.commit()
+
+
+    cursor.execute("DELETE FROM booking WHERE user_id = %s", (user_id,))
+    conn.commit()
+    conn.close()
+
+    return JSONResponse(content={"ok":True,"order_number": order_number,"message": "付款成功"}, status_code=200)
+    
+@app.get("/api/order/{orderNumber}")
+async def get_order(request:Request,orderNumber):
+
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="0000",
+        database="taipei_day_trip",
+        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
+    )
+    cursor = conn.cursor(dictionary=True)
+     
+    cursor.execute("SELECT * FROM orders WHERE order_number = %s", (orderNumber,))
+    order = cursor.fetchone()
+    
+    cursor.close()
+    conn.close()
+
+    if not order:
+        return JSONResponse(status_code=404,content={"error":"找不到訂單"})
+    
+    return {
+            "data": {
+                "number": order["order_number"],
+                "price": order["price"],
+                "status": order["status"],
+                "attraction": {
+                    "id": order["attraction_id"],
+                    "name": order["attraction_name"],
+                    "address": order["attraction_address"],
+                    "image": order["attraction_image"]
+                },
+                "date": order["date"],
+                "time": order["time"],
+                "contact": {
+                    "name": order["contact_name"],
+                    "email": order["contact_email"],
+                    "phone": order["contact_phone"]
+                }
+            }
+        }
 
 # 掛載靜態資源
 app.mount("/static", StaticFiles(directory="static"), name="static")

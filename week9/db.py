@@ -104,6 +104,27 @@ CREATE TABLE IF NOT EXISTS booking(
 conn.commit()
 print("資料表 booking 建立成功！")
 
+# 創建 order 資料表
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS orders( 
+               id INT PRIMARY KEY AUTO_INCREMENT,
+               user_id INT NOT NULL, -- 對應到 member.id
+               attraction_id INT NOT NULL, -- 對應到 attractions.id
+               date DATE NOT NULL, -- 預定要去的日期
+               time VARCHAR(255) NOT NULL, -- 預定時段：上半天或下半天
+               price INT NOT NULL, -- 價格
+               order_number VARCHAR(255) NOT NULL,
+               status INT NOT NULL DEFAULT 1,
+               rec_trade_id VARCHAR(100),                  -- TapPay 交易編號
+               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 訂單建立時間
+               
+               FOREIGN KEY (user_id) REFERENCES member(id), -- 外鍵，對應到 member 資料表的 id
+               FOREIGN KEY (attraction_id) REFERENCES attractions(id) -- 外鍵，對應到 attractions 資料表的 id
+               );
+""")
+conn.commit()
+print("資料表 order 建立成功！")
+
 cursor.close()
 conn.close()
 

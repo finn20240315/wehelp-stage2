@@ -147,9 +147,9 @@
           <div class="field">
             <p class="title-phone">手機號碼：</p>
             <input
-              type="number"
+              type="text"
               class="contact-phone"
-              placeholder="0900-111-222"
+              placeholder="0912-345-678"
             />
           </div>
           <p class="slogan">
@@ -157,26 +157,24 @@
           </p>
         </div>
         <hr class="separator-3" />
-        <div class="payment-form">
-          <p class="payment-card bold">信用卡付款資訊</p>
+        <!-- TapPay Fields -->
+        <div class="contact-form">
+          <p class="contact-title bold">信用卡付款資訊</p>
           <div class="field">
-            <p class="title-name">卡片號碼：</p>
-            <input
-              type="number"
-              class="card-number"
-              placeholder="**** **** **** ****"
-            />
+            <p class="title-card">卡片號碼：</p>
+            <div class="tpfield" id="card-number"></div>
           </div>
           <div class="field">
-            <p class="payment-expire">過期時間：</p>
-            <input type="number" class="expire-day" placeholder="MM / YY" />
+            <p class="expire-date">過期時間：</p>
+            <div class="tpfield" id="card-expiration-date"></div>
           </div>
           <div class="field">
-            <p class="payment-code">驗證密碼：</p>
-            <input type="number" class="code" placeholder="CVV" />
+            <p class="card-ccv">驗證密碼：</p>
+            <div class="tpfield" id="card-ccv"></div>
           </div>
         </div>
-        <hr class="separator-4"/>
+        <!--  -->
+        <hr class="separator-4" />
         <div class="confirm">
           <p class="total">總價：<span class="total"></span></p>
           <button class="pay">確認訂購並付款</button>
@@ -190,5 +188,6 @@
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
     <script src="/static/js/booking.js"></script>
     <script src="/static/js/login.js"></script>
+    <script src="https://js.tappaysdk.com/sdk/tpdirect/v5.14.0"></script>
   </body>
 </html>
