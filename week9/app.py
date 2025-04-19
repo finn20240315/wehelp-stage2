@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request,HTTPException,Depends
+from fastapi import FastAPI, Request,HTTPException
 # FastAPI：主要的 Web 框架，負責建立 API 伺服器
 # Request：用來處理 HTTP 請求，獲取請求相關資訊
 from fastapi.responses import FileResponse ,JSONResponse
@@ -7,19 +7,38 @@ from fastapi.responses import FileResponse ,JSONResponse
 from typing import Optional #Optional：用來定義參數為可選（非必填）。例如：Optional[str] 代表參數可以是字串或是 None
 import json # 處理 JSON 格式的資料
 import mysql.connector # 與 MySQL 資料庫建立連線，查詢景點資訊
+from mysql.connector import pooling
 import os # 操作檔案系統，如 os.path.dirname(__file__) 取得目前檔案所在的目錄
 from fastapi.middleware.cors import CORSMiddleware # 解決 CORS（跨來源請求） 問題，允許前端從不同網域存取 API
 from fastapi.staticfiles import StaticFiles #
 import jwt
 import datetime
-from datetime import date
 import json
+import httpx
+import uuid
+from dotenv import load_dotenv
+
+load_dotenv() # 讀取 .env 檔
 
 # === JWT 設定 ===
-JWT_SECRET = "my-secret-key"
+JWT_SECRET =os.getenv("JWT_SECRET")
 
 # 建立 FastAPI 應用程式，這將是我們的 API 伺服器
 app=FastAPI()
+
+dbconfig={
+    "host":"localhost",
+    "user":os.getenv("MYSQL_USER"),
+    "password":os.getenv("MYSQL_PASSWORD"),
+    "database":"taipei_day_trip",
+    "charset":"utf8mb4"
+}
+
+connection_pool=pooling.MySQLConnectionPool(
+    pool_name="mypool",
+    pool_size=20,
+    **dbconfig
+)
 
 # 設置 CORS 允許來自特定來源的請求
 app.add_middleware(
@@ -72,14 +91,8 @@ for attraction in attractions:
 @app.get("/api/attractions")
 async def get_attractions(page: int = 0, keyword: Optional[str] = None):
     print(f"API 被呼叫: /api/attractions?page={page}&keyword={keyword}")  # Debug 訊息
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="0000",
-        database="taipei_day_trip",
-        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-
-    )
+    
+    conn = connection_pool.get_connection()
     cursor = conn.cursor(dictionary=True)
 
     limit = 12
@@ -120,14 +133,7 @@ async def get_attractions(page: int = 0, keyword: Optional[str] = None):
 
 @app.get("/api/attraction/{attractionId}")
 async def get_attraction(attractionId: int):
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="0000",
-        database="taipei_day_trip",
-        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-
-    )
+    conn = connection_pool.get_connection()
     cursor = conn.cursor(dictionary=True)
 
     # 查詢指定景點
@@ -158,14 +164,7 @@ async def get_attraction(attractionId: int):
 
 @app.get("/api/mrts")
 async def get_mrts():
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="0000",
-        database="taipei_day_trip",
-        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-
-    )
+    conn = connection_pool.get_connection()
     cursor = conn.cursor(dictionary=True)
 
     # 從 MySQL 查詢各 MRT 站的景點數量
@@ -197,13 +196,7 @@ async def signup(request:Request):
         email=body.get("email")
         password=body.get("password")
 
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="0000",
-            database="taipei_day_trip",
-            charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-        )
+        conn = connection_pool.get_connection()
         cursor = conn.cursor(dictionary=True)
         
         # 檢查帳號是否已存在
@@ -260,13 +253,7 @@ async def signin(request:Request):
         email=body.get("email")
         password=body.get("password")
 
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="0000",
-            database="taipei_day_trip",
-            charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-        )
+        conn = connection_pool.get_connection()
         cursor = conn.cursor(dictionary=True)
         
         # 驗證帳號密碼
@@ -310,13 +297,7 @@ async def post_booking(request:Request):
     time=body.get("time")
     price=body.get("price")  # 所以前端要 fetch 到一個json資料裡面要有這些資料對吧?
 
-    conn=mysql.connector.connect( # connn 是什麼意思?
-        host="localhost", # # 主機名稱，通常是 localhost
-        user="root", # 使用者名稱，這邊是 root
-        password="0000", # 密碼，這邊是 0000
-        database="taipei_day_trip", # 資料庫名稱，這邊是 taipei_day_trip
-        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-    )
+    conn = connection_pool.get_connection()
     cursor=conn.cursor(dictionary=True) # 這句是什麼意思?
     
     token = request.headers.get("Authorization") # token 不是存在 localStorage 裡面嗎?
@@ -352,8 +333,15 @@ async def post_booking(request:Request):
     cursor.close()
     conn.close()
 
+    print("Body JSON:", body); # 前端送的 JSON 資料
+    print("Authorization Header:", token); # header 裡拿到的 token
+    print("Decoded Token Payload:", payload); # 解開 token 得到的使用者資訊
+    
     return JSONResponse({"ok":True,"message":"預訂成功"},status_code=200)
     
+
+
+
 # 取得預定資料 API
 @app.get("/api/booking")
 def get_booking(request:Request):
@@ -385,13 +373,7 @@ def get_booking(request:Request):
         return JSONResponse({"error":True,"message":"無效的 token"},status_code=401)
     
     # 這邊是排除了 if token is none、並且嘗試 try (沒有2個 except)才會執行的地方對嗎?
-    conn=mysql.connector.connect(
-        host="localhost",
-        username="root",
-        password="0000",
-        database="taipei_day_trip",
-        charset="utf8mb4"
-    )
+    conn = connection_pool.get_connection()
     cursor=conn.cursor(dictionary=True)
 
     cursor.execute("SELECT * FROM booking WHERE user_id=%s",(user_id,))
@@ -408,11 +390,6 @@ def get_booking(request:Request):
     attraction_id = booking["attraction_id"]
     cursor.execute("SELECT id, name, address, images FROM attractions WHERE id=%s", (attraction_id,))
     attraction = cursor.fetchone()
-    print("！！！attraction['images']是！！！：",attraction["images"])
-    print("！！！attraction['images'][0])是！！！：",attraction["images"][0])
-    print("##################")
-    print(type(attraction["images"]))
-
 
     if not attraction:
         cursor.close()
@@ -458,13 +435,7 @@ def delete_booking(request:Request):
     except jwt.PyJWTError:
         return JSONResponse({"error":True,"message":"無效的 token"},status_code=401)
     
-    conn=mysql.connector.connect(
-        host="localhost",
-        username="root",
-        password="0000",
-        database="taipei_day_trip",
-        charset="utf8mb4"
-    )
+    conn = connection_pool.get_connection()
     cursor=conn.cursor(dictionary=True)
 
     cursor.execute("DELETE FROM booking WHERE user_id=%s",(user_id,))
@@ -477,6 +448,164 @@ def delete_booking(request:Request):
 
     return JSONResponse({"ok":True,"message":"資料刪除成功"},status_code=200)
 
+# 整體流程：
+# 使用者在 /booking 頁看到信用卡輸入欄位
+# 點擊「確認訂購並付款」→ 取得 TapPay Prime
+# 將 Prime 與訂單資料送到後端 /api/orders
+# 後端建立 UNPAID 訂單 → 發送付款請求給 TapPay
+# 根據付款結果：
+#      成功 → 將訂單標記為 PAID，回傳 order number
+#      失敗 → 保持 UNPAID，仍回傳 order number
+# 前端接收 order number → 導向 /thankyou?number=xxx
+# /thankyou 頁讀取參數 → 顯示訂單號碼
+
+# 前端 booking.js
+# /booking	建立付款按鈕，發送訂單資料與 Prime 給後端
+# /thankyou 從網址取得 order number，顯示訂單成功畫面
+
+# 後端 app.py
+# 後端收到前端送來的 Prime 與訂單資訊
+# 建立訂單（order）	存入資料庫，產生訂單編號
+# 呼叫 TapPay API	用 Prime 發送付款請求
+# 儲存付款紀錄	成功 → 訂單設為 PAID，失敗 → 留 UNPAID
+# 回傳 JSON	包含 order_number
+
+# week14
+# 建立 order API
+@app.post("/api/order")
+async def post_order(request:Request):
+    body = await request.json()
+    print("前端傳來的資料：", body)
+   
+    order_number=str(uuid.uuid4())[:20]
+
+    # 發送 httpx 請求給 TapPay pay by prime api
+    async with httpx.AsyncClient()as client:
+        response=await client.post("https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime",
+            headers= {"Content-Type": "application/json",
+                      "x-api-key": os.getenv("PARTNER_KEY")},
+            json={
+            "prime": body["prime"],
+            "partner_key": os.getenv("PARTNER_KEY"),
+            "merchant_id": os.getenv("MERCHANT_ID"), 
+            "amount": body["order"]["price"],
+            "currency":"TWD",
+            "order_number":order_number,
+            "details":"TapPay Test",
+            "cardholder": {
+                "phone_number": body["order"]["contact"]["phone"],
+                "name": body["order"]["contact"]["name"],
+                "email": body["order"]["contact"]["email"],
+                },
+            "remember": True
+            }
+        )
+        
+        result=response.json()
+        print(response.status_code)  # 200
+        print("從tappay api收到的回傳資料：",result)
+        
+    
+    if result["status"]==0:
+        print("交易成功！")
+    else:
+        return JSONResponse(content={"error": True, "message": "付款失敗"}, status_code=400)
+
+    conn = connection_pool.get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:       
+        token = request.headers.get("Authorization").split(" ")[1]  # 取得 Bearer Token
+        payload = jwt.decode(token,JWT_SECRET,algorithms="HS256")
+        user_id=payload["data"]["id"]
+        print("TOKEN 是  ：",token)
+        print("USER_ID 是 ：",user_id)
+    except Exception as e:
+        return JSONResponse(content={"error":True,"message":"無效的使用者驗證"},status_code=401)
+
+    # 新增 member 表 phone 欄位
+    # 查詢欄位是否已存在
+    cursor.execute("SHOW COLUMNS FROM member LIKE 'phone'")
+    phone_result = cursor.fetchone()
+
+    if phone_result:
+        print("欄位 'phone' 已存在，不需新增。")
+    else:
+        try:
+            cursor.execute("ALTER TABLE member ADD COLUMN phone VARCHAR(20)")
+            print("成功新增欄位 'phone'")
+        except mysql.connector.Error as err:
+            print("新增欄位失敗：", err)
+
+    # 新增資料到 member 表 
+    cursor.execute("UPDATE member SET phone = %s WHERE id = %s", (body["order"]["contact"]["phone"],user_id))
+    conn.commit()
+
+    status = None
+    if result["status"] == 0:
+        status="PAID"
+    else:
+        status="UNPAID"
+
+    # 新增訂單資料到 order 表
+    cursor.execute("""
+                   INSERT INTO orders(
+                   user_id,attraction_id,date,time,price,
+                   order_number,status,rec_trade_id
+                   ) VALUES (%s, %s, %s,%s, %s, %s,%s, %s)""",
+                    (user_id,
+                     body["order"]["trip"]["attraction"]["id"],
+                     body["order"]["trip"]["date"], 
+                     body["order"]["trip"]["time"],
+                     body["order"]["price"],
+                     result["order_number"],
+                     status,
+                     result["rec_trade_id"]
+                     ))
+    conn.commit()
+
+
+    cursor.execute("DELETE FROM booking WHERE user_id = %s", (user_id,))
+    conn.commit()
+    conn.close()
+
+    return JSONResponse(content={"ok":True,"order_number": order_number,"message": "付款成功"}, status_code=200)
+    
+@app.get("/api/order/{orderNumber}")
+async def get_order(request:Request,orderNumber):
+
+    conn = connection_pool.get_connection()
+    cursor = conn.cursor(dictionary=True)
+     
+    cursor.execute("SELECT * FROM orders WHERE order_number = %s", (orderNumber,))
+    order = cursor.fetchone()
+    
+    cursor.close()
+    conn.close()
+
+    if not order:
+        return JSONResponse(status_code=404,content={"error":"找不到訂單"})
+    
+    return {
+            "data": {
+                "number": order["order_number"],
+                "price": order["price"],
+                "status": order["status"],
+                "attraction": {
+                    "id": order["attraction_id"],
+                    "name": order["attraction_name"],
+                    "address": order["attraction_address"],
+                    "image": order["attraction_image"]
+                },
+                "date": order["date"],
+                "time": order["time"],
+                "contact": {
+                    "name": order["contact_name"],
+                    "email": order["contact_email"],
+                    "phone": order["contact_phone"]
+                }
+            }
+        }
 
 # 掛載靜態資源
 app.mount("/static", StaticFiles(directory="static"), name="static")

@@ -1,0 +1,8 @@
+建立虛擬環境
+
+寫所有需要用到的套件
+
+1. 先在本機建立虛擬環境 venv ....
+2. 再在 ec2 : pip install -r requirements.txt
+
+1. 建立環境變數 

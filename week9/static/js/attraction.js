@@ -137,7 +137,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (!dateInput.reportValidity()) {
       return; // 如果驗證不通過，就不要繼續往下執行
     }
-    
+
     const token = localStorage.getItem("token");
     console.log("token:", token); // 確認 token 是否存在
 
