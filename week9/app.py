@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request,HTTPException,Depends
+from fastapi import FastAPI, Request,HTTPException
 # FastAPI：主要的 Web 框架，負責建立 API 伺服器
 # Request：用來處理 HTTP 請求，獲取請求相關資訊
 from fastapi.responses import FileResponse ,JSONResponse
@@ -7,22 +7,38 @@ from fastapi.responses import FileResponse ,JSONResponse
 from typing import Optional #Optional：用來定義參數為可選（非必填）。例如：Optional[str] 代表參數可以是字串或是 None
 import json # 處理 JSON 格式的資料
 import mysql.connector # 與 MySQL 資料庫建立連線，查詢景點資訊
+from mysql.connector import pooling
 import os # 操作檔案系統，如 os.path.dirname(__file__) 取得目前檔案所在的目錄
 from fastapi.middleware.cors import CORSMiddleware # 解決 CORS（跨來源請求） 問題，允許前端從不同網域存取 API
 from fastapi.staticfiles import StaticFiles #
 import jwt
 import datetime
-from datetime import date
 import json
 import httpx
 import uuid
-# pip install re
+from dotenv import load_dotenv
+
+load_dotenv() # 讀取 .env 檔
 
 # === JWT 設定 ===
-JWT_SECRET = "my-secret-key"
+JWT_SECRET =os.getenv("JWT_SECRET")
 
 # 建立 FastAPI 應用程式，這將是我們的 API 伺服器
 app=FastAPI()
+
+dbconfig={
+    "host":"localhost",
+    "user":os.getenv("MYSQL_USER"),
+    "password":os.getenv("MYSQL_PASSWORD"),
+    "database":"taipei_day_trip",
+    "charset":"utf8mb4"
+}
+
+connection_pool=pooling.MySQLConnectionPool(
+    pool_name="mypool",
+    pool_size=20,
+    **dbconfig
+)
 
 # 設置 CORS 允許來自特定來源的請求
 app.add_middleware(
@@ -75,14 +91,8 @@ for attraction in attractions:
 @app.get("/api/attractions")
 async def get_attractions(page: int = 0, keyword: Optional[str] = None):
     print(f"API 被呼叫: /api/attractions?page={page}&keyword={keyword}")  # Debug 訊息
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="0000",
-        database="taipei_day_trip",
-        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-
-    )
+    
+    conn = connection_pool.get_connection()
     cursor = conn.cursor(dictionary=True)
 
     limit = 12
@@ -123,14 +133,7 @@ async def get_attractions(page: int = 0, keyword: Optional[str] = None):
 
 @app.get("/api/attraction/{attractionId}")
 async def get_attraction(attractionId: int):
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="0000",
-        database="taipei_day_trip",
-        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-
-    )
+    conn = connection_pool.get_connection()
     cursor = conn.cursor(dictionary=True)
 
     # 查詢指定景點
@@ -161,14 +164,7 @@ async def get_attraction(attractionId: int):
 
 @app.get("/api/mrts")
 async def get_mrts():
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="0000",
-        database="taipei_day_trip",
-        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-
-    )
+    conn = connection_pool.get_connection()
     cursor = conn.cursor(dictionary=True)
 
     # 從 MySQL 查詢各 MRT 站的景點數量
@@ -200,13 +196,7 @@ async def signup(request:Request):
         email=body.get("email")
         password=body.get("password")
 
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="0000",
-            database="taipei_day_trip",
-            charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-        )
+        conn = connection_pool.get_connection()
         cursor = conn.cursor(dictionary=True)
         
         # 檢查帳號是否已存在
@@ -263,13 +253,7 @@ async def signin(request:Request):
         email=body.get("email")
         password=body.get("password")
 
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="0000",
-            database="taipei_day_trip",
-            charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-        )
+        conn = connection_pool.get_connection()
         cursor = conn.cursor(dictionary=True)
         
         # 驗證帳號密碼
@@ -313,13 +297,7 @@ async def post_booking(request:Request):
     time=body.get("time")
     price=body.get("price")  # 所以前端要 fetch 到一個json資料裡面要有這些資料對吧?
 
-    conn=mysql.connector.connect( # connn 是什麼意思?
-        host="localhost", # # 主機名稱，通常是 localhost
-        user="root", # 使用者名稱，這邊是 root
-        password="0000", # 密碼，這邊是 0000
-        database="taipei_day_trip", # 資料庫名稱，這邊是 taipei_day_trip
-        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-    )
+    conn = connection_pool.get_connection()
     cursor=conn.cursor(dictionary=True) # 這句是什麼意思?
     
     token = request.headers.get("Authorization") # token 不是存在 localStorage 裡面嗎?
@@ -395,13 +373,7 @@ def get_booking(request:Request):
         return JSONResponse({"error":True,"message":"無效的 token"},status_code=401)
     
     # 這邊是排除了 if token is none、並且嘗試 try (沒有2個 except)才會執行的地方對嗎?
-    conn=mysql.connector.connect(
-        host="localhost",
-        username="root",
-        password="0000",
-        database="taipei_day_trip",
-        charset="utf8mb4"
-    )
+    conn = connection_pool.get_connection()
     cursor=conn.cursor(dictionary=True)
 
     cursor.execute("SELECT * FROM booking WHERE user_id=%s",(user_id,))
@@ -463,13 +435,7 @@ def delete_booking(request:Request):
     except jwt.PyJWTError:
         return JSONResponse({"error":True,"message":"無效的 token"},status_code=401)
     
-    conn=mysql.connector.connect(
-        host="localhost",
-        username="root",
-        password="0000",
-        database="taipei_day_trip",
-        charset="utf8mb4"
-    )
+    conn = connection_pool.get_connection()
     cursor=conn.cursor(dictionary=True)
 
     cursor.execute("DELETE FROM booking WHERE user_id=%s",(user_id,))
@@ -517,11 +483,11 @@ async def post_order(request:Request):
     async with httpx.AsyncClient()as client:
         response=await client.post("https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime",
             headers= {"Content-Type": "application/json",
-                      "x-api-key": "partner_5lGT3A0K7hnY9sqKvBy8hNwfvWoEQ3ISXgDJxoVGQj2IEeWJAOKawxkj"},
+                      "x-api-key": os.getenv("PARTNER_KEY")},
             json={
             "prime": body["prime"],
-            "partner_key": "partner_5lGT3A0K7hnY9sqKvBy8hNwfvWoEQ3ISXgDJxoVGQj2IEeWJAOKawxkj",
-            "merchant_id": "shiyingtong2022_CTBC", 
+            "partner_key": os.getenv("PARTNER_KEY"),
+            "merchant_id": os.getenv("MERCHANT_ID"), 
             "amount": body["order"]["price"],
             "currency":"TWD",
             "order_number":order_number,
@@ -545,13 +511,7 @@ async def post_order(request:Request):
     else:
         return JSONResponse(content={"error": True, "message": "付款失敗"}, status_code=400)
 
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="0000",
-        database="taipei_day_trip",
-        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-    )
+    conn = connection_pool.get_connection()
     cursor = conn.cursor(dictionary=True)
 
     try:       
@@ -614,13 +574,7 @@ async def post_order(request:Request):
 @app.get("/api/order/{orderNumber}")
 async def get_order(request:Request,orderNumber):
 
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="0000",
-        database="taipei_day_trip",
-        charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
-    )
+    conn = connection_pool.get_connection()
     cursor = conn.cursor(dictionary=True)
      
     cursor.execute("SELECT * FROM orders WHERE order_number = %s", (orderNumber,))

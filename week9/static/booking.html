@@ -130,56 +130,58 @@
           </div>
         </div>
         <hr class="separator-2" />
-        <div class="contact-form">
-          <p class="contact-title bold">您的聯絡資訊</p>
-          <div class="field">
-            <p class="title-name">聯絡姓名：</p>
-            <input type="text" class="contact-name" placeholder="王大明" />
+        <form id="form">
+          <div class="contact-form">
+            <p class="contact-title bold">您的聯絡資訊</p>
+            <div class="field">
+              <p class="title-name">聯絡姓名：</p>
+              <input type="text" class="contact-name" placeholder="王大明" />
+            </div>
+            <div class="field">
+              <p class="title-email">連絡信箱：</p>
+              <input
+                type="email"
+                class="contact-email"
+                placeholder="123@email.com"
+              />
+            </div>
+            <div class="field">
+              <p class="title-phone">手機號碼：</p>
+              <input
+                type="text"
+                class="contact-phone"
+                placeholder="0912-345-678"
+                required
+              />
+            </div>
+            <p class="slogan">
+              請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。
+            </p>
           </div>
-          <div class="field">
-            <p class="title-email">連絡信箱：</p>
-            <input
-              type="email"
-              class="contact-email"
-              placeholder="123@email.com"
-            />
+          <hr class="separator-3" />
+          <!-- TapPay Fields -->
+          <div class="contact-form">
+            <p class="contact-title bold">信用卡付款資訊</p>
+            <div class="field">
+              <p class="title-card">卡片號碼：</p>
+              <div class="tpfield" id="card-number"></div>
+            </div>
+            <div class="field">
+              <p class="expire-date">過期時間：</p>
+              <div class="tpfield" id="card-expiration-date"></div>
+            </div>
+            <div class="field">
+              <p class="card-ccv">驗證密碼：</p>
+              <div class="tpfield" id="card-ccv"></div>
+            </div>
           </div>
-          <div class="field">
-            <p class="title-phone">手機號碼：</p>
-            <input
-              type="text"
-              class="contact-phone"
-              placeholder="0912-345-678"
-              required
-            />
+          <!--  -->
+          <hr class="separator-4" />
+          <div class="confirm">
+            <p class="total">總價：<span class="total"></span></p>
+            <button class="pay">確認訂購並付款</button>
           </div>
-          <p class="slogan">
-            請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。
-          </p>
-        </div>
-        <hr class="separator-3" />
-        <!-- TapPay Fields -->
-        <div class="contact-form">
-          <p class="contact-title bold">信用卡付款資訊</p>
-          <div class="field">
-            <p class="title-card">卡片號碼：</p>
-            <div class="tpfield" id="card-number"></div>
-          </div>
-          <div class="field">
-            <p class="expire-date">過期時間：</p>
-            <div class="tpfield" id="card-expiration-date"></div>
-          </div>
-          <div class="field">
-            <p class="card-ccv">驗證密碼：</p>
-            <div class="tpfield" id="card-ccv"></div>
-          </div>
-        </div>
-        <!--  -->
-        <hr class="separator-4" />
-        <div class="confirm">
-          <p class="total">總價：<span class="total"></span></p>
-          <button class="pay">確認訂購並付款</button>
-        </div>
+        </form>
       </main>
     </main>
     <!--表尾-->

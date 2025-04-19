@@ -14,9 +14,10 @@ attractions = data["result"]["results"]
 # 連線到 MySQL
 conn = mysql.connector.connect(
     host="localhost",
-    user="root",
-    password="0000",
-    database="taipei_day_trip"
+    user=os.getenv("MYSQL_USER"),
+    password=os.getenv("MYSQL_PASSWORD"),
+    database="taipei_day_trip",
+    charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
 )
 cursor = conn.cursor()
 
