@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS orders(
                time VARCHAR(255) NOT NULL, -- 預定時段：上半天或下半天
                price INT NOT NULL, -- 價格
                order_number VARCHAR(255) NOT NULL,
-               status INT NOT NULL DEFAULT 1,
+               status VARCHAR(255) DEFAULT "UNPAID",
                rec_trade_id VARCHAR(100),                  -- TapPay 交易編號
                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 訂單建立時間
                
