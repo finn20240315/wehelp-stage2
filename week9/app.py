@@ -553,12 +553,29 @@ async def post_order(request:Request):
         charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
     )
     cursor = conn.cursor(dictionary=True)
-           
-    token = request.headers.get("Authorization").split(" ")[1]  # 取得 Bearer Token
-    payload = jwt.decode(token,JWT_SECRET,algorithms="HS256")
-    user_id=payload["data"]["id"]
-    print("TOKEN 是  ：",token)
-    print("USER_ID 是 ：",user_id)
+
+    try:       
+        token = request.headers.get("Authorization").split(" ")[1]  # 取得 Bearer Token
+        payload = jwt.decode(token,JWT_SECRET,algorithms="HS256")
+        user_id=payload["data"]["id"]
+        print("TOKEN 是  ：",token)
+        print("USER_ID 是 ：",user_id)
+    except Exception as e:
+        return JSONResponse(content={"error":True,"message":"無效的使用者驗證"},status_code=401)
+
+    # 新增 member 表 phone 欄位
+    # 查詢欄位是否已存在
+    cursor.execute("SHOW COLUMNS FROM member LIKE 'phone'")
+    phone_result = cursor.fetchone()
+
+    if phone_result:
+        print("欄位 'phone' 已存在，不需新增。")
+    else:
+        try:
+            cursor.execute("ALTER TABLE member ADD COLUMN phone VARCHAR(20)")
+            print("成功新增欄位 'phone'")
+        except mysql.connector.Error as err:
+            print("新增欄位失敗：", err)
 
     # 新增資料到 member 表 
     cursor.execute("UPDATE member SET phone = %s WHERE id = %s", (body["order"]["contact"]["phone"],user_id))
