@@ -47,35 +47,33 @@ window.addEventListener("DOMContentLoaded", async () => {
     // 啟用信用卡輸入欄位，套用自訂樣式與遮罩功能
     fields: fields,
     styles: {
+      // Style all elements
       input: {
         color: "gray",
       },
+      // Styling ccv field
       "input.ccv": {
-        color: "black",
-        "font-size": "16px",
+        // 'font-size': '16px'
       },
+      // Styling expiration-date field
       "input.expiration-date": {
-        color: "black",
-        "font-size": "16px",
+        // 'font-size': '16px'
       },
+      // Styling card-number field
       "input.card-number": {
-        color: "black",
-        "font-size": "16px",
+        // 'font-size': '16px'
       },
-
-      ":focus": {},
+      // style focus state
+      ":focus": {
+        // 'color': 'black'
+      },
+      // style valid state
       ".valid": {
         color: "green",
-        "font-size": "16px",
       },
+      // style invalid state
       ".invalid": {
         color: "red",
-        "font-size": "16px",
-      },
-      "@media screen and (max-width: 400px)": {
-        input: {
-          color: "orange",
-        },
       },
     },
     isMaskCreditCardNumber: true,
