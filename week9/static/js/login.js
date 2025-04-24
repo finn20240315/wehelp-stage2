@@ -120,27 +120,40 @@ document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("token");
   console.log("token:", token); // 確認 token 是否存在
 
-  const response = await fetch("/api/user/auth", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
-    },
-  });
-  const responseData = await response.json();
-  if (!responseData.data) {
-    return;
+  try {
+    const response = await fetch("/api/user/auth", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    });
+
+    // 注意這行也可能會拋錯（如果回傳不是 JSON）
+    const responseData = await response.json();
+
+    if (!responseData.data) {
+      alert("驗證失敗，請重新登入！");
+      localStorage.clear();
+      return;
+    }
+
+    // 驗證成功後的流程
+    const signInBtn = document.querySelector(".sign-in");
+    signInBtn.textContent = "登出";
+
+    signInBtn.addEventListener("click", async () => {
+      popUpArea.style.display = "none";
+      signUpFormContainer.style.display = "none";
+      localStorage.removeItem("token");
+      window.location.reload();
+    });
+  } catch (error) {
+    alert("驗證會員時出現錯誤，請稍後再試！");
+    console.error("驗證會員時出現錯誤：", error);
+    localStorage.clear();
+    // location.reload(); // 強制刷新，避免進入不該看的頁面
   }
-  const signInBtn = document.querySelector(".sign-in");
-  signInBtn.textContent = "";
-  signInBtn.textContent = "登出";
-  
-  signInBtn.addEventListener("click", async () => {
-    popUpArea.style.display = "none"; // 隱藏黑色遮罩
-    signUpFormContainer.style.display = "none"; // 隱藏登入表單
-    localStorage.removeItem("token"); // 清除 token
-    window.location.reload(); // 重新載入頁面
-  });
 });
 
 function showMessage(message, type, formType) {

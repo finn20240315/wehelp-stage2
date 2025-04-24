@@ -187,18 +187,22 @@ hr.separator-1 {
   border: 1px solid #e8e8e8;
   margin: 0 auto;
 }
-
-/* main */
+/*main*/
 main {
   max-width: 1000px;
   width: 100%;
   padding: 0 15px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 /*預定資訊*/
 .headline {
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   padding: 0 15px;
   margin: 40px 0 30px 0;
@@ -206,151 +210,26 @@ main {
 .headline-1,
 .headline-2,
 .headline-3 {
-  margin: 0;
+  margin: 20px auto 0 auto;
   font-weight: 700;
 }
-.section {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  margin: auto 0;
-  padding: 0 25px;
-  max-width: 1200px;
-  width: auto;
-}
-.picture {
-  margin: 0 30px 0 0;
-}
-.infor {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  position: relative;
-  max-width: 700px;
-  width: 100%;
-  margin: -10px 0;
-}
-img {
-  width: 270px;
-  height: 220px;
-}
-.delete {
-  background-image: url("/static/images/delete.png");
-  width: 30px;
-  height: 30px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  position: absolute;
-  top: 0;
-  right: 0;
-  cursor: pointer;
-}
-.frame {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  margin: 5px 0;
-}
-p.main-title {
-  font-weight: 700;
-  font-size: 16px;
-  color: rgba(68, 136, 153, 1);
-  padding: 0;
-  margin: 5px auto 10px 5px;
-}
-p {
+
+.order_number {
+  margin: 20px auto 0 auto;
   font-weight: 400;
 }
-p.title,
-p.slogan {
-  font-weight: 700;
-}
-p.title,
-p.date,
-p.time,
-p.price,
-p.address {
-  margin: 5px;
-}
-/*聯絡資訊*/
-.contact-form,
-.payment-form {
-  margin: 20px 30px;
-}
-.bold {
-  font-size: 19px;
-  font-weight: 700;
-  margin: 10px 0;
-}
-.field {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-}
-input,
-div.tpfield {
-  width: 200px;
-  height: 38px;
-  border-radius: 5px;
-  font-size: 16px;
-  font-weight: 500;
-  padding: 10px;
-  color: black;
-  border: 1px solid rgba(232, 232, 232, 1);
+.headline-3 {
+  margin: 20px auto 40px auto;
 }
 
-input::placeholder {
-  color: gray;
-}
-
-hr.separator-2,
-hr.separator-3,
-hr.separator-4 {
-  margin: 40px auto;
-  width: 100%;
-  max-width: 1000px;
-  box-sizing: border-box;
-  border: 1px solid rgba(232, 232, 232, 1);
-  background-color: aqua;
-}
-.confirm {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-end;
-  margin: 0px 30px 80px 30px;
-  width: calc(100%-60px);
-  box-sizing: border-box;
-}
-p.total {
-  margin: 0 0 10px 0;
-  font-weight: 700;
-}
-button.pay {
-  background-color: rgba(68, 136, 153, 1);
-  color: white;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  font-size: 19px;
-  width: 173px;
-  height: 36px;
-  padding: 10px 20px;
-  line-height: 18px; /* 垂直置中用這招 */
-  text-align: center;
-}
-p.none {
-  margin: 0 0 50px 0;
-}
 /*表尾*/
 footer {
   background-color: #757575;
-  height: 104px;
+  height: 100%;
   color: white;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   padding: 40px 0;
   font-size: 16px;
@@ -358,48 +237,4 @@ footer {
 }
 footer h2 {
   font-size: 16px;
-}
-
-@media (max-width: 1024px) {
-  nav .taipei-trip {
-    padding: 15px;
-    white-space: nowrap;
-    font-size: 24px;
-  }
-  main {
-    padding: 0 15px;
-  }
-  .headline {
-    padding: 0 15px;
-  }
-  .section {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 0;
-  }
-  .picture {
-    width: 100%;
-  }
-  .img {
-    width: 100%;
-    height: auto;
-  }
-  .contact-form,
-  .payment-form {
-    margin: 20px 0;
-  }
-  .infor {
-    width: 100%;
-    position: relative;
-    margin: 20px 0 0 0;
-  }
-  .delete {
-    position: absolute;
-    top: auto;
-    bottom: -30px;
-    right: 30px;
-    cursor: pointer;
-  }
 }
