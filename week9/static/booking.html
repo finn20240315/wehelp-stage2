@@ -148,8 +148,10 @@
             <div class="field">
               <p class="title-phone">手機號碼：</p>
               <input
-                type="text"
+                type="tel"
                 class="contact-phone"
+                pattern="^09\d{8}$"
+                maxlength="10"
                 placeholder="0912-345-678"
                 required
               />

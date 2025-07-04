@@ -166,6 +166,24 @@ div.for-nav {
   font-size: 16px;
   font-weight: 500;
 }
+/*進度條容器*/
+#progress-container {
+  width: 100%;
+  height: 6px;
+  background-color: #e0e0e0;
+  overflow: hidden;
+  position: relative;
+  margin-top: 20px;
+  z-index: 1; /* 確保進度條在最上層 */
+}
+
+#progress-bar {
+  width: 0%;
+  height: 100%;
+  background-color: #448899;
+  transition: width 0.3s ease-in-out;
+  z-index: 2; /* 確保進度條在進度容器上層 */
+}
 
 /*首圖橫幅*/
 .hero-section {

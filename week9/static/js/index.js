@@ -1,5 +1,5 @@
-const API_BASE_URL = "http://13.211.94.227:8000/api/attractions";
-const MRT_API_URL = "http://13.211.94.227:8000/api/mrts"; // 新增捷運站 API
+const API_BASE_URL = "/api/attractions";
+const MRT_API_URL = "/api/mrts"; // 新增捷運站 API
 let allPlaces = []; // 存放所有景點資料
 let currentPage = 0; // 目前 API 請求的頁數
 let nextPage = 0; // 下一頁的頁碼
@@ -202,3 +202,41 @@ document.querySelector(".appointment").addEventListener("click", () => {
 document.querySelector(".taipei-trip").addEventListener("click", () => {
   window.location.href = "/";
 });
+
+// 進度條容器
+let progress = 0;
+const bar = document.getElementById("progress-bar");
+const cat = document.getElementById("cat-icon");
+const container = document.getElementById("progress-container");
+
+const interval = setInterval(() => {
+  if (progress < 100) {
+    progress += Math.random() * 10;
+    const percent = Math.min(progress, 100);
+    bar.style.width = percent + "%";
+
+    // 更新貓的位置
+    const containerWidth = container.offsetWidth;
+    const catWidth = cat.offsetWidth;
+    const newLeft = (containerWidth * percent) / 100 - catWidth / 2;
+    cat.style.left = `${newLeft}px`;
+  } else {
+    clearInterval(interval);
+    setTimeout(() => {
+      document.getElementById("progress-wrapper").style.display = "none";
+    }, 500);
+  }
+}, 200);
+
+// const interval = setInterval(() => {
+//   if (progress < 100) {
+//     progress += Math.random() * 10; // 每次加一點
+//     bar.style.width = Math.min(progress, 100) + "%";
+//   } else {
+//     clearInterval(interval);
+//     // 載入完成後可選擇隱藏進度條
+//     setTimeout(() => {
+//       document.getElementById("progress-container").style.display = "none";
+//     }, 500);
+//   }
+// }, 200);
