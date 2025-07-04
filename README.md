@@ -9,29 +9,34 @@ This is a travel-themed website focused on Taipei, offering a complete flow from
 - Supports keyword search and category filtering
 - Dynamic data loading using AJAX / Fetch API
 - Infinite scroll for paginated attraction listings
-![alt text](image.png)
+
+![Attraction Browsing & Search](week9/static/images/readme-Attraction%20Browsing%20%26%20Search.png)
 
 #### Tour Reservation
 - Users can log in to reserve attractions, select date and time slots
 - Personal reservation management available after login
-![alt text](image-1.png)
+  
+![Tour Reservation](week9/static/images/readme-Tour%20Reservation.png)
 
 #### User Registration & Login System
 - Implements secure login with JWT Token authentication
 - UI dynamically switches based on login status
-![alt text](image-2.png)
+  
+![User Registration & Login System](week9/static/images/readme-User%20Registration%20%26%20Login%20System.png)
 
 #### TapPay Payment Integration
 - Integrated with TapPay Prime API
 - Users can pay securely using credit cards
 - Redirects to the success page (/thankyou) upon payment confirmation
-![alt text](image-4.png)
+  
+![TapPay Payment Integration](week9/static/images/readme-TapPay%20Payment%20Integration.png)
 
 #### Order & Payment Workflow
 - Successfully creates and stores orders in the database
 - Calls TapPay API to validate transaction status
 - Provides order number for user reference and confirmation
-![alt text](image-3.png)
+  
+![Order & Payment Workflow](week9/static/images/readme-Order%20%26%20Payment%20Workflow.png)
 
 ---
 
@@ -49,5 +54,5 @@ Auth System	JWT Token
 ---
 
 ## Project Structure Overview
-![alt text](image-5.png)
+![Project Structure Overview](week9/static/images/readme-Project%20Structure%20Overview.png)
 
