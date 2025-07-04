@@ -1,6 +1,6 @@
 # Taipei Day Trip Website
 
-This is a travel-themed website focused on Taipei, offering a complete flow from browsing attractions, reserving tours, member login, online payments, to order confirmation. The project is fully deployed on AWS EC2.
+##### This is a travel-themed website focused on Taipei, offering a complete flow from browsing attractions, reserving tours, member login, online payments, to order confirmation. The project is fully deployed on AWS EC2.
 ---
 
 ## Key Features
@@ -38,6 +38,7 @@ This is a travel-themed website focused on Taipei, offering a complete flow from
   
 ![Order & Payment Workflow](week9/static/images/readme-Order%20%26%20Payment%20Workflow.png)
 
+
 ---
 
 ## Technology Stack & Architecture
@@ -55,6 +56,7 @@ This is a travel-themed website focused on Taipei, offering a complete flow from
 **Auth System**：JWT Token
 
 ---
+
 
 ## Project Structure Overview
 ![Project Structure Overview](week9/static/images/readme-Project%20Structure%20Overview.png)
