@@ -42,14 +42,17 @@ This is a travel-themed website focused on Taipei, offering a complete flow from
 
 ## Technology Stack & Architecture
 
-Category	Technology
----
-Frontend	HTML, CSS, JavaScript, Fetch API
-Backend	Python, FastAPI
-Database	MySQL (Hosted on AWS RDS)
-Third-Party	TapPay Payment API
-Deployment	AWS EC2 + Uvicorn + Nginx + HTTPS
-Auth System	JWT Token
+**Frontend**：HTML, CSS, JavaScript, Fetch API
+
+**Backend**：Python, FastAPI
+
+**Database**：MySQL (Hosted on AWS RDS)
+
+**Third-Party**：TapPay Payment API
+
+**Deployment**：AWS EC2 + Uvicorn + Nginx + HTTPS
+
+**Auth System**：JWT Token
 
 ---
 
