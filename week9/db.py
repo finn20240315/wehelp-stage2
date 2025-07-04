@@ -1,7 +1,14 @@
+# db 是 model 資料處理
+from mysql.connector import pooling # 連線池
 import json
-import mysql.connector # 與 MySQL 資料庫建立連線
+from dotenv import load_dotenv # 載入環境變數
 import os # 操作檔案系統，如 os.path.dirname(__file__) 取得目前檔案所在的目錄
 import re # 正規表達式
+
+load_dotenv() # 載入 .env 檔案中的環境變數
+
+print("MYSQL帳號是：",os.getenv("MYSQL_USER"))
+print("MYSQL密碼是：",os.getenv("MYSQL_PASSWORD"))
 
 # Week9
 # 開啟並讀取本機的 taipei-attractions.json 檔案
@@ -11,14 +18,36 @@ with open("data/taipei-attractions.json", "r", encoding="utf-8") as file:
 # 從 JSON 中提取景點資料：景點資料是一個 列表 (list)
 attractions = data["result"]["results"]
 
-# 連線到 MySQL
-conn = mysql.connector.connect(
+# 從 JSON 中提取景點資料：景點資料是一個 列表 (list)
+attractions = data["result"]["results"]
+
+# 定義 mrt_stations（假設從 attractions 取得資料）
+mrt_stations = []
+
+for attraction in attractions:
+    mrt = attraction.get("MRT", "")
+    if mrt:
+        station = next((s for s in mrt_stations if s["name"] == mrt), None)
+        if not station:
+            mrt_stations.append({"name": mrt, "attractions_count": 1})
+        else:
+            station["attractions_count"] += 1
+
+
+
+
+
+connPool = pooling.MySQLConnectionPool(
+    pool_name="mypool",
+    pool_size=20,  # 設定連線池大小
+    pool_reset_session=True,  # 每次使用後重置連線   
     host="localhost",
     user=os.getenv("MYSQL_USER"),
     password=os.getenv("MYSQL_PASSWORD"),
     database="taipei_day_trip",
     charset="utf8mb4"  # 確保 MySQL 連線使用 UTF-8
 )
+conn=connPool.get_connection()  # 從連線池中取得一個連線
 cursor = conn.cursor()
 
 # 建立資料表（如果不存在）
@@ -127,6 +156,6 @@ conn.commit()
 print("資料表 order 建立成功！")
 
 cursor.close()
-conn.close()
+conn.close() # 不是關閉連線，而是放回連線池
 
 print("資料庫已關閉離線！")

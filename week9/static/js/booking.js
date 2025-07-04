@@ -198,7 +198,13 @@ window.addEventListener("DOMContentLoaded", async () => {
       try {
         const prime = result.card.prime;
         const phone = document.querySelector("input.contact-phone").value;
-
+        
+        // 👉 加在這裡：檢查 phone 為空時直接中止
+        if (!phone) {
+          alert("請填寫手機號碼！");
+          return;
+        }
+        
         const orderData = {
           prime: prime,
           order: {

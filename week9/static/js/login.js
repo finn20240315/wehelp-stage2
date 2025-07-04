@@ -120,6 +120,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("token");
   console.log("token:", token); // 確認 token 是否存在
 
+  // ✅ 若尚未登入，直接 return，不要打 API
+  if (!token) {
+    console.log("未登入狀態，不進行會員驗證");
+    return;
+  }
+
   try {
     const response = await fetch("/api/user/auth", {
       method: "GET",
